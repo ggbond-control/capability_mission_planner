@@ -9,6 +9,7 @@
 #include <numeric>
 #include <set>
 #include <stdexcept>
+#include <utility>
 
 namespace capability_mission_planner::offline {
 namespace {
@@ -34,26 +35,20 @@ void recompute_route(
   const double speed = robot.nominal_speed_mps > 0.0 ? robot.nominal_speed_mps :
     planner.options().nominal_speed_mps;
   for (const auto& stop : route.stops) {
-    auto segment_ticks = exact_paths ?
-      planner.plan(current, stop.location, robot.capabilities, clearance, speed).travel_ticks :
-      planner.estimate_distance(current, stop.location, robot.capabilities,
-        clearance, speed);
-    route.travel_ticks += segment_ticks;
+    const auto path = exact_paths ?
+      planner.plan_exact(current, stop.location, robot.capabilities, clearance, speed) :
+      planner.plan(current, stop.location, robot.capabilities, clearance, speed);
+    route.travel_ticks += path.travel_ticks;
     route.service_ticks += stop.service_ticks;
-  if (exact_paths)
-      route.segments.push_back(planner.plan(current, stop.location,
-        robot.capabilities, clearance, speed));
+    route.segments.push_back(path);
     current = stop.location;
   }
   if (robot.return_home && !route.stops.empty()) {
-    auto segment_ticks = exact_paths ?
-      planner.plan(current, robot.start, robot.capabilities, clearance, speed).travel_ticks :
-      planner.estimate_distance(current, robot.start, robot.capabilities,
-        clearance, speed);
-    route.travel_ticks += segment_ticks;
-    if (exact_paths)
-      route.segments.push_back(planner.plan(current, robot.start,
-        robot.capabilities, clearance, speed));
+    const auto path = exact_paths ?
+      planner.plan_exact(current, robot.start, robot.capabilities, clearance, speed) :
+      planner.plan(current, robot.start, robot.capabilities, clearance, speed);
+    route.travel_ticks += path.travel_ticks;
+    route.segments.push_back(path);
   }
 }
 
@@ -66,6 +61,22 @@ double objective(
   for (const auto& route : routes) {
     maximum = std::max(maximum, route.load_ticks());
     total += route.load_ticks();
+  }
+  return weights.maximum_load * maximum + weights.total_load * total;
+}
+
+double objective_with_replacement(
+  const std::vector<MappedRobotRoute>& routes,
+  std::size_t replaced,
+  const MappedRobotRoute& candidate,
+  const ObjectiveWeights& weights)
+{
+  int maximum = 0;
+  int total = 0;
+  for (std::size_t i = 0; i < routes.size(); ++i) {
+    const int load = i == replaced ? candidate.load_ticks() : routes[i].load_ticks();
+    maximum = std::max(maximum, load);
+    total += load;
   }
   return weights.maximum_load * maximum + weights.total_load * total;
 }
@@ -336,8 +347,8 @@ std::vector<MappedRobotRoute> build_routes(
       double first = std::numeric_limits<double>::infinity(), second = first;
       for (std::size_t r = 0; r < robots.size(); ++r) if (compatible(robots[r], tasks[ti])) {
         for (const auto& candidate : state_insertion_options(states[r], ti, tasks[ti], service_ticks[ti])) {
-          auto trial = routes; trial[r] = candidate.route;
-          const double score = objective(trial, weights);
+          const double score = objective_with_replacement(
+            routes, r, candidate.route, weights);
           if (score < first) { second = first; first = score; }
           else if (score < second) second = score;
         }
@@ -352,7 +363,8 @@ std::vector<MappedRobotRoute> build_routes(
     double best = std::numeric_limits<double>::infinity(); std::size_t owner = robots.size(); MappedRobotRoute selected;
     for (std::size_t r = 0; r < robots.size(); ++r) if (compatible(robots[r], tasks[ti])) {
       for (auto candidate : state_insertion_options(states[r], ti, tasks[ti], service_ticks[ti])) {
-        auto trial = routes; trial[r] = candidate.route; const double score = objective(trial, weights);
+        const double score = objective_with_replacement(
+          routes, r, candidate.route, weights);
         if (score < best) { best = score; owner = r; selected = std::move(candidate.route); }
       }
     }
@@ -477,13 +489,52 @@ OfflineMissionPlan OfflineMissionPlanner::plan(
   });
 
   _path_planner.reset_stats();
+  const auto allocation_started = std::chrono::steady_clock::now();
+  std::vector<GridPosition> estimate_positions;
+  estimate_positions.reserve(robots.size() + tasks.size());
+  auto add_position = [&](const GridPosition& position) {
+    if (std::find(estimate_positions.begin(), estimate_positions.end(), position) ==
+      estimate_positions.end())
+      estimate_positions.push_back(position);
+  };
+  for (const auto& robot : robots) add_position(robot.start);
+  for (const auto& task : tasks) add_position(task.location);
+  std::vector<PathQueryProfile> estimate_profiles;
+  estimate_profiles.reserve(robots.size());
+  for (const auto& robot : robots) {
+    const PathQueryProfile profile{
+      std::max(0.0, robot.clearance_radius_m + robot.safety_margin_m),
+      robot.nominal_speed_mps > 0.0 ? robot.nominal_speed_mps :
+        _path_planner.options().nominal_speed_mps};
+    const auto found = std::find_if(estimate_profiles.begin(), estimate_profiles.end(),
+      [&](const auto& existing) {
+        return existing.required_clearance_m == profile.required_clearance_m &&
+          existing.nominal_speed_mps == profile.nominal_speed_mps;
+      });
+    if (found == estimate_profiles.end()) estimate_profiles.push_back(profile);
+  }
+  const auto precompute_started = std::chrono::steady_clock::now();
+  _path_planner.precompute_estimates(estimate_positions, estimate_profiles);
+  const auto precompute_finished = std::chrono::steady_clock::now();
   auto routes = build_routes(robots, tasks, service_ticks, _path_planner, _weights, 0U);
+  const auto allocation_finished = std::chrono::steady_clock::now();
 
   OfflineMissionPlan result;
+  result.allocation_seconds = std::chrono::duration<double>(
+    allocation_finished - allocation_started).count();
+  result.estimate_precompute_seconds = std::chrono::duration<double>(
+    precompute_finished - precompute_started).count();
   result.allocation_path_stats = _path_planner.stats();
   result.routes = std::move(routes);
+  const auto final_started = std::chrono::steady_clock::now();
   for (std::size_t i = 0; i < result.routes.size(); ++i)
-    recompute_route(result.routes[i], robots[i], _path_planner, true);
+    // Keep the configured planning resolution for reported loads and the
+    // coordination timeline. plan_exact remains available for explicit
+    // full-resolution refinement by callers.
+    recompute_route(result.routes[i], robots[i], _path_planner, false);
+  const auto final_finished = std::chrono::steady_clock::now();
+  result.final_path_seconds = std::chrono::duration<double>(
+    final_finished - final_started).count();
   result.total_path_stats = _path_planner.stats();
   result.time_step_seconds = time_step;
   for (const auto& route : result.routes) {
@@ -491,8 +542,12 @@ OfflineMissionPlan OfflineMissionPlanner::plan(
     result.total_load_ticks += route.load_ticks();
   }
   if (coordinate_conflicts && !robots.empty()) {
+    const auto coordination_started = std::chrono::steady_clock::now();
     result.schedules = coordinate_multi_map_routes(
       _path_planner, robots, result.routes);
+    const auto coordination_finished = std::chrono::steady_clock::now();
+    result.coordination_seconds = std::chrono::duration<double>(
+      coordination_finished - coordination_started).count();
     result.shared_resources = _path_planner.options().shared_resources;
     extract_navigation_annotations(result, tasks);
   }

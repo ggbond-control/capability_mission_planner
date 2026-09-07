@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
+#include <sys/resource.h>
 
 using namespace capability_mission_planner::offline;
 
@@ -28,6 +29,8 @@ int main(int argc, char* argv[]) {
     const auto seconds = [](const auto begin, const auto end) {
       return std::chrono::duration<double>(end - begin).count();
     };
+    struct rusage usage{};
+    getrusage(RUSAGE_SELF, &usage);
 
     std::cout << "planning complete\n"
               << "  maps: " << request.bundle->maps.size() << '\n'
@@ -41,8 +44,46 @@ int main(int argc, char* argv[]) {
               << plan.allocation_path_stats.estimate_requests << '\n'
               << "  allocation_grid_searches: "
               << plan.allocation_path_stats.grid_searches << '\n'
+              << "  allocation_a_star_searches: "
+              << plan.allocation_path_stats.a_star_searches << '\n'
+              << "  allocation_expanded_nodes: "
+              << plan.allocation_path_stats.expanded_nodes << '\n'
+              << "  allocation_cache_hits: "
+              << plan.allocation_path_stats.cache_hits << '\n'
+              << "  allocation_cache_hit_ratio: "
+              << (plan.allocation_path_stats.estimate_requests == 0U ? 0.0 :
+                static_cast<double>(plan.allocation_path_stats.cache_hits) /
+                static_cast<double>(plan.allocation_path_stats.estimate_requests)) << '\n'
+              << "  allocation_grid_search_seconds: "
+              << plan.allocation_path_stats.grid_search_seconds << '\n'
+              << "  allocation_distance_field_searches: "
+              << plan.allocation_path_stats.distance_field_searches << '\n'
+              << "  allocation_distance_field_seconds: "
+              << plan.allocation_path_stats.distance_field_seconds << '\n'
               << "  total_grid_searches: "
               << plan.total_path_stats.grid_searches << '\n'
+              << "  total_a_star_searches: "
+              << plan.total_path_stats.a_star_searches << '\n'
+              << "  total_expanded_nodes: "
+              << plan.total_path_stats.expanded_nodes << '\n'
+              << "  total_cache_hits: "
+              << plan.total_path_stats.cache_hits << '\n'
+              << "  total_grid_search_seconds: "
+              << plan.total_path_stats.grid_search_seconds << '\n'
+              << "  total_distance_field_searches: "
+              << plan.total_path_stats.distance_field_searches << '\n'
+              << "  total_distance_field_seconds: "
+              << plan.total_path_stats.distance_field_seconds << '\n'
+              << "  timing_allocation_seconds: "
+              << plan.allocation_seconds << '\n'
+              << "  timing_estimate_precompute_seconds: "
+              << plan.estimate_precompute_seconds << '\n'
+              << "  timing_final_path_seconds: "
+              << plan.final_path_seconds << '\n'
+              << "  timing_coordination_seconds: "
+              << plan.coordination_seconds << '\n'
+              << "  peak_rss_mb: "
+              << static_cast<double>(usage.ru_maxrss) / 1024.0 << '\n'
               << "  timing_load_and_parse_seconds: "
               << seconds(total_start, loaded_at) << '\n'
               << "  timing_planning_seconds: "
