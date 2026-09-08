@@ -163,6 +163,11 @@ ConfiguredMission OfflinePlannerConfigLoader::load(
     map_options.inscribed_radius = root["map"]["inscribed_radius_m"].as<double>();
   if (root["map"]["cost_scaling_factor"])
     map_options.cost_scaling_factor = root["map"]["cost_scaling_factor"].as<double>();
+  if (root["map"]["persistent_cache"])
+    map_options.persistent_cache = root["map"]["persistent_cache"].as<bool>();
+  if (root["map"]["cache_directory"])
+    map_options.cache_directory = resolve_path(
+      config_path, root["map"]["cache_directory"].as<std::string>());
   if (map_options.inflation_radius < 0.0)
     throw std::runtime_error("map.inflation_radius_m must be non-negative");
   if (map_options.inscribed_radius < 0.0 || map_options.cost_scaling_factor <= 0.0)

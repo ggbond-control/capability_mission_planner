@@ -3,6 +3,7 @@
 #include <capability_mission_planner/search/conflict_based_search.hpp>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <limits>
 #include <map>
@@ -213,8 +214,11 @@ std::vector<RouteFrame> make_frames(const MappedRobot& robot, const MappedRobotR
 class Environment {
 public:
   Environment(std::vector<std::vector<RouteFrame>> frames,
-    const MultiMapBundle& bundle, const std::vector<MappedRobot>& robots)
-  : _frames(std::move(frames)), _bundle(bundle), _robots(robots) {}
+    const MultiMapBundle& bundle, const std::vector<MappedRobot>& robots,
+    CoordinationStats* stats)
+  : _frames(std::move(frames)), _bundle(bundle), _robots(robots), _stats(stats) {}
+
+  void set_cbs_phase(bool value) { _cbs_phase = value; }
 
   void setLowLevelContext(std::size_t agent, const Constraints* constraints) {
     _agent = agent;
@@ -224,6 +228,10 @@ public:
     for (const auto& constraint : constraints->vertex)
       if (constraint.position == goal)
         _last_goal_constraint = std::max(_last_goal_constraint, constraint.tick);
+    if (_stats) {
+      if (_cbs_phase) ++_stats->cbs_low_level_searches;
+      else ++_stats->prioritized_low_level_searches;
+    }
   }
 
   int admissibleHeuristic(const State& state) const {
@@ -250,6 +258,13 @@ public:
   }
 
   bool getFirstConflict(const std::vector<Plan>& plans, Conflict& output) const {
+    const auto started = std::chrono::steady_clock::now();
+    const auto finish = [&]() {
+      if (!_stats) return;
+      ++_stats->conflict_checks;
+      _stats->conflict_check_seconds += std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - started).count();
+    };
     std::size_t horizon = 0;
     for (const auto& plan : plans) horizon = std::max(horizon, plan.states.size());
     for (std::size_t tick = 0; tick < horizon; ++tick) {
@@ -260,12 +275,14 @@ public:
           if (!first.resource.empty() && first.resource == second.resource) {
             output = Conflict{Conflict::Type::Resource, static_cast<int>(tick),
               a, b, {}, {}, {}, {}, first.resource};
+            finish();
             return true;
           }
           if (positions_too_close(first.position, second.position, a, b)) {
             output = Conflict{Conflict::Type::Vertex, static_cast<int>(tick),
               a, b, first.position, first.position, second.position,
               second.position, {}};
+            finish();
             return true;
           }
           if (tick + 1U >= horizon) continue;
@@ -279,11 +296,13 @@ public:
             output = Conflict{Conflict::Type::Edge, static_cast<int>(tick),
               a, b, first.position, first_next.position,
               second.position, second_next.position, {}};
+            finish();
             return true;
           }
         }
       }
     }
+    finish();
     return false;
   }
 
@@ -312,8 +331,14 @@ public:
     }
   }
 
-  void onExpandHighLevelNode(int) {}
-  void onExpandLowLevelNode(const State&, int, int) {}
+  void onExpandHighLevelNode(int) {
+    if (_stats && _cbs_phase) ++_stats->cbs_high_level_expanded_nodes;
+  }
+  void onExpandLowLevelNode(const State&, int, int) {
+    if (!_stats) return;
+    if (_cbs_phase) ++_stats->cbs_low_level_expanded_nodes;
+    else ++_stats->prioritized_low_level_expanded_nodes;
+  }
 
   bool allowedAgainstPlans(std::size_t agent, const State& from, const State& to,
     const std::vector<Plan>& plans, const std::vector<std::size_t>& fixed) const {
@@ -374,6 +399,8 @@ private:
   std::vector<std::vector<RouteFrame>> _frames;
   const MultiMapBundle& _bundle;
   const std::vector<MappedRobot>& _robots;
+  CoordinationStats* _stats = nullptr;
+  bool _cbs_phase = false;
   std::size_t _agent = 0;
   const Constraints* _constraints = nullptr;
   int _last_goal_constraint = -1;
@@ -439,7 +466,8 @@ bool prioritized_schedule(Environment& environment, const std::vector<State>& st
 std::vector<std::vector<TimedMapState>> coordinate_multi_map_routes(
   const MultiMapPathPlanner& path_planner,
   const std::vector<MappedRobot>& robots,
-  const std::vector<MappedRobotRoute>& routes)
+  const std::vector<MappedRobotRoute>& routes,
+  CoordinationStats* stats)
 {
   if (robots.size() != routes.size())
     throw std::invalid_argument("robot and route counts must match");
@@ -455,11 +483,17 @@ std::vector<std::vector<TimedMapState>> coordinate_multi_map_routes(
       frames.back().front().resource});
   }
 
-  Environment environment(std::move(frames), path_planner.bundle(), robots);
+  if (stats) *stats = {};
+  Environment environment(std::move(frames), path_planner.bundle(), robots, stats);
   std::vector<Plan> plans;
-  if (!prioritized_schedule(environment, starts,
+  if (stats) stats->prioritized_attempted = true;
+  const bool prioritized_succeeded = prioritized_schedule(environment, starts,
     static_cast<int>(std::min(maximum_tick,
-      static_cast<std::size_t>(std::numeric_limits<int>::max()))), plans)) {
+      static_cast<std::size_t>(std::numeric_limits<int>::max()))), plans);
+  if (stats) stats->prioritized_succeeded = prioritized_succeeded;
+  if (!prioritized_succeeded) {
+    if (stats) stats->cbs_started = true;
+    environment.set_cbs_phase(true);
     search::CBS<State, Action, int, Conflict, Constraints, Environment, StateHash> cbs(
       environment, path_planner.options().coordination_max_high_level_nodes);
     if (!cbs.search(starts, plans)) {
@@ -467,6 +501,7 @@ std::vector<std::vector<TimedMapState>> coordinate_multi_map_routes(
         throw std::runtime_error("multi-map CBS reached its high-level node limit");
       throw std::runtime_error("multi-map CBS could not find a conflict-free schedule");
     }
+    if (stats) stats->cbs_succeeded = true;
   }
 
   std::vector<std::vector<TimedMapState>> output(plans.size());
@@ -480,6 +515,12 @@ std::vector<std::vector<TimedMapState>> coordinate_multi_map_routes(
         transition = state.resource.substr(sizeof(prefix) - 1U);
       output[i].push_back({state.position, state.tick, std::move(transition),
         state.frame, state.resource});
+    }
+    for (std::size_t frame = 1; frame < plans[i].states.size(); ++frame) {
+      const auto& previous = plans[i].states[frame - 1U].first;
+      const auto& current = plans[i].states[frame].first;
+      if (current.frame == previous.frame && stats)
+        ++stats->total_wait_ticks;
     }
   }
   return output;

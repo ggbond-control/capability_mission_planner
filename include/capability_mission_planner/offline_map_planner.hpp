@@ -44,6 +44,10 @@ struct MapLayer {
   std::vector<unsigned char> traversable;
   std::vector<float> clearance_m;
   std::vector<unsigned char> inflated_cost;
+  bool loaded_from_persistent_cache = false;
+  double cache_validation_seconds = 0.0;
+  double cache_read_seconds = 0.0;
+  double preprocess_seconds = 0.0;
 
   bool is_traversable(int x, int y) const;
   double clearance(int x, int y) const;
@@ -70,12 +74,19 @@ struct MapLoadOptions {
   double inflation_radius = 0.0;
   double inscribed_radius = 0.0;
   double cost_scaling_factor = 10.0;
+  bool persistent_cache = true;
+  std::filesystem::path cache_directory;
 };
 
 struct MultiMapBundle {
   std::filesystem::path directory;
   std::map<std::string, MapLayer> maps;
   std::vector<MapTransition> transitions;
+  std::size_t map_cache_hits = 0;
+  std::size_t map_cache_misses = 0;
+  double map_cache_validation_seconds = 0.0;
+  double map_cache_read_seconds = 0.0;
+  double map_preprocess_seconds = 0.0;
 
   const MapLayer& map(const std::string& id) const;
   bool traversable(const GridPosition& position) const;
@@ -139,6 +150,21 @@ struct PathPlannerStats {
   double grid_search_seconds = 0.0;
   std::size_t distance_field_searches = 0;
   double distance_field_seconds = 0.0;
+};
+
+struct CoordinationStats {
+  bool prioritized_attempted = false;
+  bool prioritized_succeeded = false;
+  bool cbs_started = false;
+  bool cbs_succeeded = false;
+  std::size_t prioritized_low_level_searches = 0;
+  std::size_t prioritized_low_level_expanded_nodes = 0;
+  std::size_t cbs_high_level_expanded_nodes = 0;
+  std::size_t cbs_low_level_searches = 0;
+  std::size_t cbs_low_level_expanded_nodes = 0;
+  std::size_t conflict_checks = 0;
+  double conflict_check_seconds = 0.0;
+  std::size_t total_wait_ticks = 0;
 };
 
 class MultiMapPathPlanner {
@@ -307,6 +333,7 @@ struct OfflineMissionPlan {
   double estimate_precompute_seconds = 0.0;
   double final_path_seconds = 0.0;
   double coordination_seconds = 0.0;
+  CoordinationStats coordination_stats;
 };
 
 class OfflineMissionPlanner {

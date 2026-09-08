@@ -5,6 +5,8 @@
 #include <yaml-cpp/yaml.h>
 
 #include <algorithm>
+#include <cstdint>
+#include <chrono>
 #include <cmath>
 #include <deque>
 #include <fstream>
@@ -17,6 +19,204 @@ namespace capability_mission_planner::offline {
 namespace {
 
 constexpr double pi = 3.14159265358979323846;
+constexpr std::uint64_t map_cache_magic = 0x434d504d415000ULL; // "CMPMAP"
+constexpr std::uint32_t max_cache_string_size = 4096U;
+
+struct SourceFingerprint {
+  std::uint64_t size = 0U;
+  std::int64_t modified_ticks = 0;
+};
+
+bool fingerprint(const std::filesystem::path& path, SourceFingerprint& output) {
+  std::error_code error;
+  const auto size = std::filesystem::file_size(path, error);
+  if (error) return false;
+  const auto modified = std::filesystem::last_write_time(path, error);
+  if (error) return false;
+  output.size = size;
+  output.modified_ticks = static_cast<std::int64_t>(
+    modified.time_since_epoch().count());
+  return true;
+}
+
+std::uint64_t fnv1a_text(const std::string& value) {
+  std::uint64_t hash = 1469598103934665603ULL;
+  for (const auto character : value) {
+    hash ^= static_cast<unsigned char>(character);
+    hash *= 1099511628211ULL;
+  }
+  return hash;
+}
+
+std::filesystem::path cache_path_for(
+  const std::filesystem::path& yaml_path, const std::string& map_id,
+  const MapLoadOptions& options)
+{
+  const auto directory = options.cache_directory.empty()
+    ? yaml_path.parent_path() / ".capability_mission_cache"
+    : options.cache_directory;
+  std::ostringstream name;
+  name << map_id << '-' << std::hex << fnv1a_text(yaml_path.string()) << ".bin";
+  return directory / name.str();
+}
+
+template<typename T>
+bool read_binary(std::istream& input, T& value) {
+  input.read(reinterpret_cast<char*>(&value), sizeof(value));
+  return static_cast<bool>(input);
+}
+
+template<typename T>
+bool write_binary(std::ostream& output, const T& value) {
+  output.write(reinterpret_cast<const char*>(&value), sizeof(value));
+  return static_cast<bool>(output);
+}
+
+bool read_string(std::istream& input, std::string& value) {
+  std::uint32_t size = 0U;
+  if (!read_binary(input, size) || size > max_cache_string_size) return false;
+  value.resize(size);
+  input.read(value.data(), static_cast<std::streamsize>(size));
+  return static_cast<bool>(input);
+}
+
+bool write_string(std::ostream& output, const std::string& value) {
+  if (value.size() > max_cache_string_size) return false;
+  const auto size = static_cast<std::uint32_t>(value.size());
+  return write_binary(output, size) &&
+    (size == 0U || static_cast<bool>(output.write(value.data(), size)));
+}
+
+bool matches_options(const MapLoadOptions& options, bool allow_unknown,
+  double inflation_radius, double inscribed_radius, double cost_scaling_factor)
+{
+  return options.allow_unknown == allow_unknown &&
+    options.inflation_radius == inflation_radius &&
+    options.inscribed_radius == inscribed_radius &&
+    options.cost_scaling_factor == cost_scaling_factor;
+}
+
+bool load_cached_map(
+  MapLayer& map, const std::filesystem::path& path, const MapLoadOptions& options,
+  double& validation_seconds, double& read_seconds)
+{
+  const auto validation_started = std::chrono::steady_clock::now();
+  std::ifstream input(path, std::ios::binary);
+  std::uint64_t magic = 0;
+  SourceFingerprint yaml_source;
+  SourceFingerprint image_source;
+  bool allow_unknown = false;
+  double inflation_radius = 0.0;
+  double inscribed_radius = 0.0;
+  double cost_scaling_factor = 0.0;
+  std::int32_t width = 0;
+  std::int32_t height = 0;
+  std::string id;
+  std::string image_path;
+  double resolution = 0.0;
+  double origin_x = 0.0;
+  double origin_y = 0.0;
+  double origin_yaw = 0.0;
+  if (!input || !read_binary(input, magic) || magic != map_cache_magic ||
+    !read_binary(input, yaml_source.size) ||
+    !read_binary(input, yaml_source.modified_ticks) ||
+    !read_binary(input, image_source.size) ||
+    !read_binary(input, image_source.modified_ticks) ||
+    !read_binary(input, allow_unknown) ||
+    !read_binary(input, inflation_radius) ||
+    !read_binary(input, inscribed_radius) ||
+    !read_binary(input, cost_scaling_factor) ||
+    !read_string(input, id) || !read_string(input, image_path) ||
+    !read_binary(input, width) || !read_binary(input, height) ||
+    !read_binary(input, resolution) || !read_binary(input, origin_x) ||
+    !read_binary(input, origin_y) || !read_binary(input, origin_yaw) ||
+    id != map.id || width <= 0 || height <= 0 || !(resolution > 0.0) ||
+    !matches_options(options, allow_unknown, inflation_radius, inscribed_radius,
+      cost_scaling_factor))
+    return false;
+  SourceFingerprint current_yaml;
+  const auto cached_image_path = std::filesystem::path(image_path);
+  SourceFingerprint current_image;
+  if (!fingerprint(map.yaml_path, current_yaml) ||
+    !fingerprint(cached_image_path, current_image) ||
+    current_yaml.size != yaml_source.size ||
+    current_yaml.modified_ticks != yaml_source.modified_ticks ||
+    current_image.size != image_source.size ||
+    current_image.modified_ticks != image_source.modified_ticks)
+  {
+    return false;
+  }
+  const auto count = static_cast<std::size_t>(width) * static_cast<std::size_t>(height);
+  if (count == 0U || count > 100000000U) return false;
+  validation_seconds = std::chrono::duration<double>(
+    std::chrono::steady_clock::now() - validation_started).count();
+  const auto read_started = std::chrono::steady_clock::now();
+  map.traversable.resize(count);
+  map.clearance_m.resize(count);
+  map.inflated_cost.resize(count);
+  input.read(reinterpret_cast<char*>(map.traversable.data()),
+    static_cast<std::streamsize>(map.traversable.size()));
+  input.read(reinterpret_cast<char*>(map.clearance_m.data()),
+    static_cast<std::streamsize>(map.clearance_m.size() * sizeof(float)));
+  input.read(reinterpret_cast<char*>(map.inflated_cost.data()),
+    static_cast<std::streamsize>(map.inflated_cost.size()));
+  if (!input) return false;
+  read_seconds = std::chrono::duration<double>(
+    std::chrono::steady_clock::now() - read_started).count();
+  map.image_path = cached_image_path;
+  map.width = width;
+  map.height = height;
+  map.resolution = resolution;
+  map.origin_x = origin_x;
+  map.origin_y = origin_y;
+  map.origin_yaw = origin_yaw;
+  return true;
+}
+
+void save_cached_map(const MapLayer& map, const std::filesystem::path& path,
+  const MapLoadOptions& options) {
+  SourceFingerprint yaml_source;
+  SourceFingerprint image_source;
+  if (!fingerprint(map.yaml_path, yaml_source) || !fingerprint(map.image_path, image_source))
+    return;
+  std::error_code error;
+  std::filesystem::create_directories(path.parent_path(), error);
+  if (error) return;
+  const auto temporary = path.string() + ".tmp";
+  std::ofstream output(temporary, std::ios::binary | std::ios::trunc);
+  const std::int32_t width = map.width;
+  const std::int32_t height = map.height;
+  if (!write_binary(output, map_cache_magic) ||
+    !write_binary(output, yaml_source.size) ||
+    !write_binary(output, yaml_source.modified_ticks) ||
+    !write_binary(output, image_source.size) ||
+    !write_binary(output, image_source.modified_ticks) ||
+    !write_binary(output, options.allow_unknown) ||
+    !write_binary(output, options.inflation_radius) ||
+    !write_binary(output, options.inscribed_radius) ||
+    !write_binary(output, options.cost_scaling_factor) ||
+    !write_string(output, map.id) || !write_string(output, map.image_path.string()) ||
+    !write_binary(output, width) || !write_binary(output, height) ||
+    !write_binary(output, map.resolution) || !write_binary(output, map.origin_x) ||
+    !write_binary(output, map.origin_y) || !write_binary(output, map.origin_yaw))
+  {
+    return;
+  }
+  output.write(reinterpret_cast<const char*>(map.traversable.data()),
+    static_cast<std::streamsize>(map.traversable.size()));
+  output.write(reinterpret_cast<const char*>(map.clearance_m.data()),
+    static_cast<std::streamsize>(map.clearance_m.size() * sizeof(float)));
+  output.write(reinterpret_cast<const char*>(map.inflated_cost.data()),
+    static_cast<std::streamsize>(map.inflated_cost.size()));
+  output.close();
+  if (!output) return;
+  std::filesystem::rename(temporary, path, error);
+  if (error) {
+    std::filesystem::remove(path, error);
+    error.clear();
+    std::filesystem::rename(temporary, path, error);
+  }
+}
 
 std::string trim(std::string value) {
   const auto first = value.find_first_not_of(" \t\r\n");
@@ -66,18 +266,32 @@ double occupancy_from_pixel(unsigned char pixel, bool negate) {
 }
 
 MapLayer load_map(const std::filesystem::path& yaml_path, const MapLoadOptions& options) {
+  if (options.inflation_radius < 0.0 || options.inscribed_radius < 0.0 ||
+    options.cost_scaling_factor <= 0.0)
+  {
+    throw std::runtime_error(yaml_path.string() + ": invalid clearance cost parameters");
+  }
+  MapLayer map;
+  map.id = yaml_path.stem().string();
+  map.yaml_path = std::filesystem::absolute(yaml_path);
+  const auto cache_path = options.persistent_cache ?
+    cache_path_for(map.yaml_path, map.id, options) : std::filesystem::path{};
+  if (!cache_path.empty() && load_cached_map(map, cache_path, options,
+      map.cache_validation_seconds, map.cache_read_seconds)) {
+    map.loaded_from_persistent_cache = true;
+    return map;
+  }
+
+  const auto preprocess_started = std::chrono::steady_clock::now();
   const auto yaml = YAML::LoadFile(yaml_path.string());
   for (const auto* key : {"image", "resolution", "origin"}) {
     if (!yaml[key])
       throw std::runtime_error(yaml_path.string() + ": missing " + key);
   }
 
-  MapLayer map;
-  map.id = yaml_path.stem().string();
-  map.yaml_path = std::filesystem::absolute(yaml_path);
   map.image_path = yaml["image"].as<std::string>();
   if (map.image_path.is_relative())
-    map.image_path = yaml_path.parent_path() / map.image_path;
+    map.image_path = map.yaml_path.parent_path() / map.image_path;
   map.image_path = std::filesystem::absolute(map.image_path);
   map.resolution = yaml["resolution"].as<double>();
   if (!(map.resolution > 0.0))
@@ -103,9 +317,6 @@ MapLayer load_map(const std::filesystem::path& yaml_path, const MapLoadOptions& 
   }
   if (mode != "trinary" && mode != "scale" && mode != "raw")
     throw std::runtime_error(yaml_path.string() + ": unsupported map mode " + mode);
-  if (options.inscribed_radius < 0.0 || options.cost_scaling_factor <= 0.0)
-    throw std::runtime_error(yaml_path.string() + ": invalid clearance cost parameters");
-
   const auto image = cv::imread(map.image_path.string(), cv::IMREAD_GRAYSCALE);
   if (image.empty())
     throw std::runtime_error("cannot read map image: " + map.image_path.string());
@@ -173,6 +384,9 @@ MapLayer load_map(const std::filesystem::path& yaml_path, const MapLoadOptions& 
         free_mask.at<unsigned char>(row, x) != 0U;
     }
   }
+  if (!cache_path.empty()) save_cached_map(map, cache_path, options);
+  map.preprocess_seconds = std::chrono::duration<double>(
+    std::chrono::steady_clock::now() - preprocess_started).count();
   return map;
 }
 
@@ -390,6 +604,11 @@ std::shared_ptr<const MultiMapBundle> MapBundleLoader::load(
     if (!entry.is_regular_file() || entry.path().extension() != ".yaml")
       continue;
     auto map = load_map(entry.path(), options);
+    if (map.loaded_from_persistent_cache) ++bundle->map_cache_hits;
+    else ++bundle->map_cache_misses;
+    bundle->map_cache_validation_seconds += map.cache_validation_seconds;
+    bundle->map_cache_read_seconds += map.cache_read_seconds;
+    bundle->map_preprocess_seconds += map.preprocess_seconds;
     if (!bundle->maps.emplace(map.id, std::move(map)).second)
       throw std::runtime_error("duplicate map id in " + directory.string());
   }

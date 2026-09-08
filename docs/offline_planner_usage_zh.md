@@ -64,12 +64,19 @@ map:
   inflation_radius_m: 0.0
   inscribed_radius_m: 0.0
   cost_scaling_factor: 10.0
+  persistent_cache: true
+  cache_directory: ../../maps/myj1/.capability_mission_cache
 ```
 
 - `allow_unknown`：是否允许路径经过未知栅格。
 - `inflation_radius_m`：按机器人安全半径膨胀障碍物，单位为米。
 - `inscribed_radius_m` 和 `cost_scaling_factor`：生成 Nav2 风格简化软代价场，供
   任务级路线排序使用，不替代 Nav2 的实时 footprint 检查。
+- `persistent_cache`：是否将可通行栅格、净空场和软代价场保存为磁盘缓存；默认开启。
+  设置为 `false` 时每次启动都重新解析并预处理地图。
+- `cache_directory`：可选缓存目录；未设置时写入每张地图目录下的
+  `.capability_mission_cache/`。缓存使用地图 YAML/PNG 的文件大小和修改时间及地图
+  参数校验；任一项变化时自动重建。
 
 ## 4. 机器人和任务输入
 

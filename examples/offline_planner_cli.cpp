@@ -34,6 +34,14 @@ int main(int argc, char* argv[]) {
 
     std::cout << "planning complete\n"
               << "  maps: " << request.bundle->maps.size() << '\n'
+              << "  map_cache_hits: " << request.bundle->map_cache_hits << '\n'
+              << "  map_cache_misses: " << request.bundle->map_cache_misses << '\n'
+              << "  map_cache_validation_seconds: "
+              << request.bundle->map_cache_validation_seconds << '\n'
+              << "  map_cache_read_seconds: "
+              << request.bundle->map_cache_read_seconds << '\n'
+              << "  map_preprocess_seconds: "
+              << request.bundle->map_preprocess_seconds << '\n'
               << "  robots: " << request.robots.size() << '\n'
               << "  tasks: " << request.tasks.size() << '\n'
               << "  maximum_load_seconds: "
@@ -82,6 +90,26 @@ int main(int argc, char* argv[]) {
               << plan.final_path_seconds << '\n'
               << "  timing_coordination_seconds: "
               << plan.coordination_seconds << '\n'
+              << "  coordination_prioritized_succeeded: "
+              << (plan.coordination_stats.prioritized_succeeded ? "true" : "false") << '\n'
+              << "  coordination_prioritized_low_level_searches: "
+              << plan.coordination_stats.prioritized_low_level_searches << '\n'
+              << "  coordination_prioritized_expanded_nodes: "
+              << plan.coordination_stats.prioritized_low_level_expanded_nodes << '\n'
+              << "  coordination_cbs_started: "
+              << (plan.coordination_stats.cbs_started ? "true" : "false") << '\n'
+              << "  coordination_cbs_high_level_expanded_nodes: "
+              << plan.coordination_stats.cbs_high_level_expanded_nodes << '\n'
+              << "  coordination_cbs_low_level_searches: "
+              << plan.coordination_stats.cbs_low_level_searches << '\n'
+              << "  coordination_cbs_low_level_expanded_nodes: "
+              << plan.coordination_stats.cbs_low_level_expanded_nodes << '\n'
+              << "  coordination_conflict_checks: "
+              << plan.coordination_stats.conflict_checks << '\n'
+              << "  coordination_conflict_check_seconds: "
+              << plan.coordination_stats.conflict_check_seconds << '\n'
+              << "  coordination_total_wait_seconds: "
+              << plan.coordination_stats.total_wait_ticks * plan.time_step_seconds << '\n'
               << "  peak_rss_mb: "
               << static_cast<double>(usage.ru_maxrss) / 1024.0 << '\n'
               << "  timing_load_and_parse_seconds: "

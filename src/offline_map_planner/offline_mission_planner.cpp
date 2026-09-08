@@ -544,7 +544,7 @@ OfflineMissionPlan OfflineMissionPlanner::plan(
   if (coordinate_conflicts && !robots.empty()) {
     const auto coordination_started = std::chrono::steady_clock::now();
     result.schedules = coordinate_multi_map_routes(
-      _path_planner, robots, result.routes);
+      _path_planner, robots, result.routes, &result.coordination_stats);
     const auto coordination_finished = std::chrono::steady_clock::now();
     result.coordination_seconds = std::chrono::duration<double>(
       coordination_finished - coordination_started).count();
