@@ -21,25 +21,23 @@ struct RouteFrame {
 struct State {
   int tick = 0;
   std::size_t frame = 0;
-  GridPosition position;
-  std::string resource;
 
   bool operator==(const State& other) const {
-    return tick == other.tick && frame == other.frame &&
-      position == other.position && resource == other.resource;
+    return tick == other.tick && frame == other.frame;
   }
 };
 
+std::size_t grid_position_hash(const GridPosition& position) {
+  std::size_t value = std::hash<std::string>{}(position.map_id);
+  value ^= static_cast<std::size_t>(static_cast<unsigned int>(position.x)) * 73856093U;
+  value ^= static_cast<std::size_t>(static_cast<unsigned int>(position.y)) * 19349663U;
+  return value;
+}
+
 struct StateHash {
   std::size_t operator()(const State& state) const noexcept {
-    std::size_t value = std::hash<std::string>{}(state.position.map_id);
-    value ^= std::hash<std::string>{}(state.resource) + 0x9e3779b9U +
-      (value << 6U) + (value >> 2U);
-    value ^= static_cast<std::size_t>(static_cast<unsigned int>(state.position.x)) * 73856093U;
-    value ^= static_cast<std::size_t>(static_cast<unsigned int>(state.position.y)) * 19349663U;
-    value ^= static_cast<std::size_t>(state.tick) * 83492791U;
-    value ^= state.frame * 2654435761U;
-    return value;
+    return static_cast<std::size_t>(state.tick) * 83492791U ^
+      state.frame * 2654435761U;
   }
 };
 
@@ -54,7 +52,8 @@ struct VertexConstraint {
 };
 struct VertexHash {
   std::size_t operator()(const VertexConstraint& value) const noexcept {
-    return StateHash{}(State{value.tick, 0U, value.position, {}});
+    return grid_position_hash(value.position) ^
+      static_cast<std::size_t>(value.tick) * 83492791U;
   }
 };
 
@@ -82,8 +81,8 @@ struct EdgeConstraint {
 };
 struct EdgeHash {
   std::size_t operator()(const EdgeConstraint& value) const noexcept {
-    return StateHash{}(State{value.tick, 0U, value.from, {}}) ^
-      (StateHash{}(State{0, 0U, value.to, {}}) << 1U);
+    return grid_position_hash(value.from) ^ (grid_position_hash(value.to) << 1U) ^
+      static_cast<std::size_t>(value.tick) * 83492791U;
   }
 };
 
@@ -220,6 +219,10 @@ public:
 
   void set_cbs_phase(bool value) { _cbs_phase = value; }
 
+  const RouteFrame& route_frame(std::size_t agent, const State& state) const {
+    return _frames.at(agent).at(state.frame);
+  }
+
   void setLowLevelContext(std::size_t agent, const Constraints* constraints) {
     _agent = agent;
     _constraints = constraints;
@@ -229,8 +232,19 @@ public:
       if (constraint.position == goal)
         _last_goal_constraint = std::max(_last_goal_constraint, constraint.tick);
     if (_stats) {
+      if (_stats->prioritized_expanded_nodes_by_robot.size() < _frames.size()) {
+        _stats->prioritized_expanded_nodes_by_robot.assign(_frames.size(), 0U);
+        _stats->prioritized_searches_by_robot.assign(_frames.size(), 0U);
+        _stats->route_frames_by_robot.resize(_frames.size());
+        _stats->prioritized_frame_expansions_by_robot.resize(_frames.size());
+        for (std::size_t i = 0; i < _frames.size(); ++i)
+          _stats->route_frames_by_robot[i] = _frames[i].size();
+      }
       if (_cbs_phase) ++_stats->cbs_low_level_searches;
-      else ++_stats->prioritized_low_level_searches;
+      else {
+        ++_stats->prioritized_low_level_searches;
+        ++_stats->prioritized_searches_by_robot[agent];
+      }
     }
   }
 
@@ -245,14 +259,13 @@ public:
     std::vector<search::Neighbor<State, Action, int>>& neighbors) const
   {
     // A robot may wait at a cell, but not midway through an edge or transition.
-    if (!is_in_transit(state.resource)) {
+    if (!is_in_transit(route_frame(_agent, state).resource)) {
       State waiting = state;
       ++waiting.tick;
       if (allowed(state, waiting)) neighbors.emplace_back(std::move(waiting), Action::Wait, 1);
     }
     if (state.frame + 1U < _frames[_agent].size()) {
-      const auto& frame = _frames[_agent][state.frame + 1U];
-      State next{state.tick + 1, state.frame + 1U, frame.position, frame.resource};
+      State next{state.tick + 1, state.frame + 1U};
       if (allowed(state, next)) neighbors.emplace_back(std::move(next), Action::Advance, 1);
     }
   }
@@ -272,30 +285,34 @@ public:
         for (std::size_t b = a + 1U; b < plans.size(); ++b) {
           const auto& first = state_at(plans[a], tick);
           const auto& second = state_at(plans[b], tick);
-          if (!first.resource.empty() && first.resource == second.resource) {
+          const auto& first_frame = route_frame(a, first);
+          const auto& second_frame = route_frame(b, second);
+          if (!first_frame.resource.empty() && first_frame.resource == second_frame.resource) {
             output = Conflict{Conflict::Type::Resource, static_cast<int>(tick),
-              a, b, {}, {}, {}, {}, first.resource};
+              a, b, {}, {}, {}, {}, first_frame.resource};
             finish();
             return true;
           }
-          if (positions_too_close(first.position, second.position, a, b)) {
+          if (positions_too_close(first_frame.position, second_frame.position, a, b)) {
             output = Conflict{Conflict::Type::Vertex, static_cast<int>(tick),
-              a, b, first.position, first.position, second.position,
-              second.position, {}};
+              a, b, first_frame.position, first_frame.position, second_frame.position,
+              second_frame.position, {}};
             finish();
             return true;
           }
           if (tick + 1U >= horizon) continue;
           const auto& first_next = state_at(plans[a], tick + 1U);
           const auto& second_next = state_at(plans[b], tick + 1U);
-          if (first.resource.empty() && second.resource.empty() &&
-            first_next.resource.empty() && second_next.resource.empty() &&
-            swept_paths_too_close(first.position, first_next.position,
-              second.position, second_next.position, a, b))
+          const auto& first_next_frame = route_frame(a, first_next);
+          const auto& second_next_frame = route_frame(b, second_next);
+          if (first_frame.resource.empty() && second_frame.resource.empty() &&
+            first_next_frame.resource.empty() && second_next_frame.resource.empty() &&
+            swept_paths_too_close(first_frame.position, first_next_frame.position,
+              second_frame.position, second_next_frame.position, a, b))
           {
             output = Conflict{Conflict::Type::Edge, static_cast<int>(tick),
-              a, b, first.position, first_next.position,
-              second.position, second_next.position, {}};
+              a, b, first_frame.position, first_next_frame.position,
+              second_frame.position, second_next_frame.position, {}};
             finish();
             return true;
           }
@@ -334,28 +351,36 @@ public:
   void onExpandHighLevelNode(int) {
     if (_stats && _cbs_phase) ++_stats->cbs_high_level_expanded_nodes;
   }
-  void onExpandLowLevelNode(const State&, int, int) {
+  void onExpandLowLevelNode(const State& state, int, int) {
     if (!_stats) return;
     if (_cbs_phase) ++_stats->cbs_low_level_expanded_nodes;
-    else ++_stats->prioritized_low_level_expanded_nodes;
+    else {
+      ++_stats->prioritized_low_level_expanded_nodes;
+      ++_stats->prioritized_expanded_nodes_by_robot[_agent];
+      auto& frames = _stats->prioritized_frame_expansions_by_robot[_agent];
+      if (frames.size() <= state.frame) frames.resize(state.frame + 1U, 0U);
+      ++frames[state.frame];
+    }
   }
 
   bool allowedAgainstPlans(std::size_t agent, const State& from, const State& to,
     const std::vector<Plan>& plans, const std::vector<std::size_t>& fixed) const {
     for (const auto other : fixed) {
       const auto& other_to = state_at(plans[other], static_cast<std::size_t>(to.tick));
-      if (!to.resource.empty() && to.resource == other_to.resource) return false;
-      if (positions_too_close(to.position, other_to.position, agent, other)) return false;
+      const auto& to_frame = route_frame(agent, to);
+      const auto& other_to_frame = route_frame(other, other_to);
+      if (!to_frame.resource.empty() && to_frame.resource == other_to_frame.resource) return false;
+      if (positions_too_close(to_frame.position, other_to_frame.position, agent, other)) return false;
       const auto& other_from = state_at(plans[other], static_cast<std::size_t>(from.tick));
-      if (from.resource.empty() && to.resource.empty() &&
-        other_from.resource.empty() && other_to.resource.empty() &&
-        swept_paths_too_close(from.position, to.position, other_from.position,
-          other_to.position, agent, other)) return false;
+      const auto& from_frame = route_frame(agent, from);
+      const auto& other_from_frame = route_frame(other, other_from);
+      if (from_frame.resource.empty() && to_frame.resource.empty() &&
+        other_from_frame.resource.empty() && other_to_frame.resource.empty() &&
+        swept_paths_too_close(from_frame.position, to_frame.position, other_from_frame.position,
+          other_to_frame.position, agent, other)) return false;
     }
     return true;
   }
-
-
 
 private:
   MetricPose root_pose(const GridPosition& position) const {
@@ -388,11 +413,13 @@ private:
   }
 
   bool allowed(const State& from, const State& to) const {
-    if (_constraints->vertex.count({to.tick, to.position}) != 0U) return false;
-    if (!to.resource.empty() &&
-      _constraints->resource.count({to.tick, to.resource}) != 0U) return false;
-    if (from.resource.empty() && to.resource.empty() &&
-      _constraints->edge.count({from.tick, from.position, to.position}) != 0U) return false;
+    const auto& from_frame = route_frame(_agent, from);
+    const auto& to_frame = route_frame(_agent, to);
+    if (_constraints->vertex.count({to.tick, to_frame.position}) != 0U) return false;
+    if (!to_frame.resource.empty() &&
+      _constraints->resource.count({to.tick, to_frame.resource}) != 0U) return false;
+    if (from_frame.resource.empty() && to_frame.resource.empty() &&
+      _constraints->edge.count({from.tick, from_frame.position, to_frame.position}) != 0U) return false;
     return true;
   }
 
@@ -479,8 +506,7 @@ std::vector<std::vector<TimedMapState>> coordinate_multi_map_routes(
   for (std::size_t i = 0; i < robots.size(); ++i) {
     frames.push_back(make_frames(robots[i], routes[i], path_planner.options()));
     maximum_tick += frames.back().size();
-    starts.push_back(State{0, 0U, frames.back().front().position,
-      frames.back().front().resource});
+    starts.push_back(State{0, 0U});
   }
 
   if (stats) *stats = {};
@@ -511,10 +537,11 @@ std::vector<std::vector<TimedMapState>> coordinate_multi_map_routes(
       (void)cost;
       std::string transition;
       constexpr const char prefix[] = "transition:";
-      if (state.resource.compare(0, sizeof(prefix) - 1U, prefix) == 0)
-        transition = state.resource.substr(sizeof(prefix) - 1U);
-      output[i].push_back({state.position, state.tick, std::move(transition),
-        state.frame, state.resource});
+      const auto& frame = environment.route_frame(i, state);
+      if (frame.resource.compare(0, sizeof(prefix) - 1U, prefix) == 0)
+        transition = frame.resource.substr(sizeof(prefix) - 1U);
+      output[i].push_back({frame.position, state.tick, std::move(transition),
+        state.frame, frame.resource});
     }
     for (std::size_t frame = 1; frame < plans[i].states.size(); ++frame) {
       const auto& previous = plans[i].states[frame - 1U].first;

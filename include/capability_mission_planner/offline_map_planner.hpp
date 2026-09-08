@@ -165,6 +165,10 @@ struct CoordinationStats {
   std::size_t conflict_checks = 0;
   double conflict_check_seconds = 0.0;
   std::size_t total_wait_ticks = 0;
+  std::vector<std::size_t> prioritized_expanded_nodes_by_robot;
+  std::vector<std::size_t> prioritized_searches_by_robot;
+  std::vector<std::size_t> route_frames_by_robot;
+  std::vector<std::vector<std::size_t>> prioritized_frame_expansions_by_robot;
 };
 
 class MultiMapPathPlanner {

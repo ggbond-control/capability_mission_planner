@@ -1,5 +1,6 @@
 #include <capability_mission_planner/offline_planner_config.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
@@ -109,7 +110,25 @@ int main(int argc, char* argv[]) {
               << "  coordination_conflict_check_seconds: "
               << plan.coordination_stats.conflict_check_seconds << '\n'
               << "  coordination_total_wait_seconds: "
-              << plan.coordination_stats.total_wait_ticks * plan.time_step_seconds << '\n'
+              << plan.coordination_stats.total_wait_ticks * plan.time_step_seconds << '\n';
+    for (std::size_t i = 0; i < plan.coordination_stats.route_frames_by_robot.size(); ++i) {
+      const auto& frame_expansions =
+        plan.coordination_stats.prioritized_frame_expansions_by_robot[i];
+      const auto hottest = std::max_element(
+        frame_expansions.begin(), frame_expansions.end());
+      std::cout << "  coordination_robot_" << i << "_route_frames: "
+                << plan.coordination_stats.route_frames_by_robot[i] << '\n'
+                << "  coordination_robot_" << i << "_prioritized_searches: "
+                << plan.coordination_stats.prioritized_searches_by_robot[i] << '\n'
+                << "  coordination_robot_" << i << "_prioritized_expanded_nodes: "
+                << plan.coordination_stats.prioritized_expanded_nodes_by_robot[i] << '\n'
+                << "  coordination_robot_" << i << "_hottest_frame: "
+                << (hottest == frame_expansions.end() ? 0U : static_cast<std::size_t>(
+                  std::distance(frame_expansions.begin(), hottest))) << '\n'
+                << "  coordination_robot_" << i << "_hottest_frame_expansions: "
+                << (hottest == frame_expansions.end() ? 0U : *hottest) << '\n';
+    }
+    std::cout
               << "  peak_rss_mb: "
               << static_cast<double>(usage.ru_maxrss) / 1024.0 << '\n'
               << "  timing_load_and_parse_seconds: "
