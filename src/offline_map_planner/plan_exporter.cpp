@@ -105,16 +105,13 @@ const std::vector<cv::Scalar>& colors() {
   return values;
 }
 
-void write_json(
-  const std::filesystem::path& path,
+std::string serialize_json(
   const MultiMapBundle& bundle,
   const std::vector<MappedRobot>& robots,
   const std::vector<MappedTask>& tasks,
   const OfflineMissionPlan& plan)
 {
-  std::ofstream output(path);
-  if (!output)
-    throw std::runtime_error("cannot write " + path.string());
+  std::ostringstream output;
   output << std::setprecision(10);
   output << "{\n  \"time_step_seconds\": " << plan.time_step_seconds
          << ",\n  \"maximum_load_ticks\": " << plan.maximum_load_ticks
@@ -166,6 +163,7 @@ void write_json(
     output << '\n';
   }
   output << "  ]\n}\n";
+  return output.str();
 }
 
 void write_summary(
@@ -204,6 +202,15 @@ void write_summary(
 
 } // namespace
 
+std::string PlanExporter::to_json(
+  const MultiMapBundle& bundle,
+  const std::vector<MappedRobot>& robots,
+  const std::vector<MappedTask>& tasks,
+  const OfflineMissionPlan& plan)
+{
+  return serialize_json(bundle, robots, tasks, plan);
+}
+
 void PlanExporter::write(
   const std::filesystem::path& output_directory,
   const MultiMapBundle& bundle,
@@ -213,7 +220,10 @@ void PlanExporter::write(
   const ExportOptions& options)
 {
   std::filesystem::create_directories(output_directory);
-  write_json(output_directory / "plan.json", bundle, robots, tasks, plan);
+  std::ofstream json_output(output_directory / "plan.json");
+  if (!json_output)
+    throw std::runtime_error("cannot write " + (output_directory / "plan.json").string());
+  json_output << serialize_json(bundle, robots, tasks, plan);
   write_summary(output_directory / "summary.txt", bundle, robots, tasks, plan);
 
   std::vector<std::size_t> owner(tasks.size(), robots.size());

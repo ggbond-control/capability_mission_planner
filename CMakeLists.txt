@@ -11,6 +11,10 @@ option(BUILD_OFFLINE_MAP_ADAPTER "Build the offline Nav2 map adapter" ON)
 option(BUILD_SCENARIO_TESTS "Run tests requiring capability_mission_scenarios" OFF)
 set(SCENARIO_ROOT "" CACHE PATH "Path to capability_mission_scenarios")
 
+find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rcl_interfaces REQUIRED)
+
 add_library(capability_mission_planner
   src/grid_path_planner.cpp
   src/mission_planner.cpp
@@ -52,6 +56,11 @@ if(BUILD_OFFLINE_MAP_ADAPTER)
   add_executable(capability_mission_planner_cli examples/offline_planner_cli.cpp)
   target_link_libraries(capability_mission_planner_cli PRIVATE
     capability_mission_planner_map_adapter)
+
+  add_executable(capability_mission_planner_node src/ros/mission_planner_node.cpp)
+  target_link_libraries(capability_mission_planner_node
+    capability_mission_planner_map_adapter)
+  ament_target_dependencies(capability_mission_planner_node rclcpp rcl_interfaces)
 endif()
 
 if(BUILD_IMAGE_MAP_DEMO)
@@ -61,6 +70,26 @@ if(BUILD_IMAGE_MAP_DEMO)
   target_link_libraries(image_map_demo PRIVATE
     capability_mission_planner ${OpenCV_LIBS})
 endif()
+
+install(TARGETS
+  capability_mission_planner
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
+if(TARGET capability_mission_planner_map_adapter)
+  install(TARGETS
+    capability_mission_planner_map_adapter
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin)
+endif()
+if(TARGET capability_mission_planner_node)
+  install(TARGETS capability_mission_planner_node
+    RUNTIME DESTINATION lib/${PROJECT_NAME})
+endif()
+install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY config/ DESTINATION share/${PROJECT_NAME}/config)
+install(DIRECTORY launch/ DESTINATION share/${PROJECT_NAME}/launch)
 
 if(BUILD_TESTING)
   enable_testing()
@@ -141,3 +170,7 @@ if(BUILD_TESTING)
     endif()
   endif()
 endif()
+
+ament_export_include_directories(include)
+ament_export_dependencies(rclcpp rcl_interfaces)
+ament_package()

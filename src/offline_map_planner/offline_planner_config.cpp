@@ -147,6 +147,17 @@ ConfiguredMission OfflinePlannerConfigLoader::load(
 {
   const auto config_path = std::filesystem::absolute(raw_config_path).lexically_normal();
   const auto root = YAML::LoadFile(config_path.string());
+  return load_node(root, config_path, true);
+}
+
+ConfiguredMission OfflinePlannerConfigLoader::load_node(
+  const YAML::Node& root,
+  const std::filesystem::path& raw_base_path,
+  bool require_output_directory)
+{
+  const auto base_path = raw_base_path.empty() ?
+    std::filesystem::current_path() / "inline_mission.yaml" :
+    std::filesystem::absolute(raw_base_path).lexically_normal();
   require_map(root, "configuration root");
   if (root["version"] && root["version"].as<int>() != 1)
     throw std::runtime_error("unsupported configuration version");
@@ -167,7 +178,7 @@ ConfiguredMission OfflinePlannerConfigLoader::load(
     map_options.persistent_cache = root["map"]["persistent_cache"].as<bool>();
   if (root["map"]["cache_directory"])
     map_options.cache_directory = resolve_path(
-      config_path, root["map"]["cache_directory"].as<std::string>());
+      base_path, root["map"]["cache_directory"].as<std::string>());
   if (map_options.inflation_radius < 0.0)
     throw std::runtime_error("map.inflation_radius_m must be non-negative");
   if (map_options.inscribed_radius < 0.0 || map_options.cost_scaling_factor <= 0.0)
@@ -175,11 +186,12 @@ ConfiguredMission OfflinePlannerConfigLoader::load(
 
   ConfiguredMission result;
   result.bundle = MapBundleLoader::load(
-    resolve_path(config_path, root["map"]["directory"].as<std::string>()), map_options);
-  if (!root["output_directory"])
+    resolve_path(base_path, root["map"]["directory"].as<std::string>()), map_options);
+  if (require_output_directory && !root["output_directory"])
     throw std::runtime_error("output_directory is required");
-  result.output_directory = resolve_path(
-    config_path, root["output_directory"].as<std::string>());
+  if (root["output_directory"])
+    result.output_directory = resolve_path(
+      base_path, root["output_directory"].as<std::string>());
 
   const auto planner = root["planner"];
   if (planner) require_map(planner, "planner");

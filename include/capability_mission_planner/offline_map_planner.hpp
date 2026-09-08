@@ -363,6 +363,11 @@ struct ExportOptions {
 
 class PlanExporter {
 public:
+  static std::string to_json(
+    const MultiMapBundle& bundle,
+    const std::vector<MappedRobot>& robots,
+    const std::vector<MappedTask>& tasks,
+    const OfflineMissionPlan& plan);
   static void write(
     const std::filesystem::path& output_directory,
     const MultiMapBundle& bundle,

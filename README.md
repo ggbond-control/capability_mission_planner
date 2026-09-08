@@ -83,6 +83,9 @@ For an actual configurable run, edit a scenario configuration in
 The complete Chinese input, parameter, coordinate, and output reference is in
 [`docs/offline_planner_usage_zh.md`](docs/offline_planner_usage_zh.md).
 
+The ROS2 service adapter and task-planning bridge interface are documented in
+[`docs/ros2_service_interface_zh.md`](docs/ros2_service_interface_zh.md).
+
 No ROS2 process is started and no result is published. Each output directory
 contains:
 
