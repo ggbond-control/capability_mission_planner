@@ -77,7 +77,7 @@ For an actual configurable run, edit a scenario configuration in
 
 ```bash
 ./build/capability_mission_planner_cli \
-  ../capability_mission_scenarios/configs/myj1.yaml
+  ../capability_mission_scenarios/configs/myj1/myj1.yaml
 ```
 
 The complete Chinese input, parameter, coordinate, and output reference is in

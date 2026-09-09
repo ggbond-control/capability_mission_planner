@@ -1,6 +1,6 @@
 # ROS2 任务规划服务接口
 
-`capability_mission_planner_node` 只通过 ROS2 服务与任务规划桥交互，不包含 MQTT、服务器协议或地图目录表依赖。
+规划节点只通过 ROS2 服务与任务规划桥交互。任务 YAML 文件、地图包和输出目录必须能被规划节点访问。
 
 ## 构建与启动
 
@@ -11,20 +11,6 @@ source install/setup.bash
 ros2 launch capability_mission_planner capability_mission_planner.launch.py
 ```
 
-无需单独执行 `cmake --build`。启动节点也不需要指定地图参数。
-
-启动参数：
-
-- `max_request_bytes`：单次 `mission_json` 最大字节数，默认 `1048576`。
-- `max_result_bytes`：单次计划结果最大字节数，默认 `4194304`。
-
-例如：
-
-```bash
-ros2 launch capability_mission_planner capability_mission_planner.launch.py \
-  max_request_bytes:=2097152 max_result_bytes:=8388608
-```
-
 ## 服务
 
 ```text
@@ -32,108 +18,37 @@ ros2 launch capability_mission_planner capability_mission_planner.launch.py \
 服务类型: rcl_interfaces/srv/SetParameters
 ```
 
-请求必须恰好有一个参数：
+请求必须恰好有一个字符串参数：
 
 ```text
-name: mission_json
+name: mission_yaml_path
 type: PARAMETER_STRING
-string_value: <UTF-8 JSON>
+string_value: 任务 YAML 文件的绝对路径
 ```
 
-请求 JSON：
+调用示例：
 
-```json
-{
-  "request_id": "mission-20260908-0001",
-  "map": {
-    "directory": "/data/mission_maps/bdz1",
-    "allow_unknown": false,
-    "inflation_radius_m": 0.0,
-    "inscribed_radius_m": 0.20,
-    "cost_scaling_factor": 10.0,
-    "persistent_cache": true
-  },
-  "robots": [
-    {
-      "id": "robot-01",
-      "start": {"map_id": "bdz1", "grid": [100, 1036]},
-      "capabilities": ["fire", "camera", "gas"],
-      "return_home": true,
-      "clearance_radius_m": 0.01,
-      "safety_margin_m": 0.0,
-      "nominal_speed_mps": 0.8,
-      "footprint_radius_m": 0.0
-    }
-  ],
-  "tasks": [
-    {
-      "id": "task-001",
-      "location": {"map_id": "bdz1", "grid": [300, 1036]},
-      "requirements": ["fire"],
-      "category": "fire_suppression",
-      "service_seconds": 6,
-      "high_priority": true,
-      "position_tolerance_m": 0.0
-    }
-  ],
-  "planner": {
-    "coordinate_conflicts": true,
-    "objective": {
-      "maximum_load_weight": 1.5,
-      "total_load_weight": 0.1
-    },
-    "traversal": {
-      "time_step_seconds": 0.1,
-      "nominal_speed_mps": 0.8,
-      "obstacle_cost_weight": 1.0,
-      "allow_diagonal": true,
-      "downsample_costmap": true,
-      "coarse_search_factor": 4
-    }
-  },
-  "export": {
-    "navigation_checkpoint_types": ["start", "task", "turn", "holding", "finish"]
-  }
-}
+```bash
+ros2 service call /capability_mission_planner/plan \
+  rcl_interfaces/srv/SetParameters \
+  "{parameters: [{name: mission_yaml_path, value: {type: 4, string_value: '/data/missions/mission-001.yaml'}}]}"
 ```
 
-`request_id` 和 `map.directory` 是必填字段。`map.directory` 必须是规划节点所在设备上已经存在的绝对路径。该目录直接包含地图 YAML、PNG，以及多地图任务所需的 `map_relations.csv`、`transition_points.csv` 等文件；不依赖 `capability_mission_scenarios` 仓库。
-
-`map.persistent_cache: true` 时，规划器会在地图目录中读取或生成 `.capability_mission_cache`。可以通过 `map.cache_directory` 指定一个单独的缓存目录。
-
-对于多地图任务，`map.directory` 指向整个地图包，机器人和任务位置的 `map_id` 必须是该包中实际存在的地图 ID。
-
-`export.navigation_checkpoint_types` 可选，用于筛选返回的
-`navigation_checkpoints`。未填写时返回全部类型；合法值是 `start`、`task`、`turn`、
-`resource_entry`、`resource_exit`、`transition_entry`、`transition_exit`、`wait`、
-`finish`。它只控制输出，不影响任务分配、路径、冲突协调或 `return_home`。`holding`
-仅在协调器实际安排等待时出现，等待时段由 `arrival_tick` 与 `departure_tick` 给出。
+节点读取该 YAML 配置并执行规划。配置中的相对路径相对于 YAML 文件所在目录解析；地图包本身使用标准 Nav2 地图 YAML、PNG 和多地图 CSV 文件。配置中的 `output_directory` 为必填字段。
 
 ## 响应
-
-请求只有一个参数，因此 `response.results` 也只有一个 `SetParametersResult`。
 
 成功时：
 
 ```text
 successful = true
-reason = {"request_id":"...","status":"success","plan":{...}}
+reason = /data/mission_results/mission-001/plan.json
 ```
 
-`plan` 与 CLI 输出的 `plan.json` 使用同一结构，包含地图信息、每台机器人路线、停靠任务、导航检查点、交通等待事件及负载统计。
+规划器会在 `output_directory` 中生成 `plan.json`、`summary.txt` 和路线 PNG，`reason` 只返回已生成 `plan.json` 的绝对路径，任务规划桥直接读取该文件即可。
 
-失败时：
+失败时 `successful = false`，`reason` 为可读的失败原因，例如参数错误、路径不是绝对 `.yaml` 文件、文件不存在、YAML/地图配置错误或无可行规划结果。
 
-```text
-successful = false
-reason = {"status":"error","code":"INVALID_REQUEST","message":"..."}
-```
+## 配置要点
 
-错误码：
-
-- `INVALID_REQUEST`：参数名、参数类型、任务 JSON 或地图目录不合法。
-- `REQUEST_TOO_LARGE`：请求为空或超过 `max_request_bytes`。
-- `RESULT_TOO_LARGE`：完整计划超过 `max_result_bytes`。
-- `PLANNING_FAILED`：任务无法规划、能力不匹配、地图文件无效、位置不可通行或规划过程异常。
-
-第一版将完整计划放入 `reason`，任务规划桥需要按 JSON 解析该字段，而不能将其视为普通错误文本。
+任务输入保持 YAML，输出计划保持 JSON。`export.navigation_checkpoint_types` 可选，用于筛选 `navigation_checkpoints`，不影响任务分配、路径、返航或冲突协调。合法值是 `start`、`task`、`turn`、`resource_entry`、`resource_exit`、`transition_entry`、`transition_exit`、`holding`、`finish`。`holding` 仅在协调器实际安排等待时出现，等待区间由 `arrival_tick` 和 `departure_tick` 给出；同一等待也会记录在 `traffic_events` 中。

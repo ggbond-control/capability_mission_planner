@@ -23,14 +23,14 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ./build/capability_mission_planner_cli \
-  ../capability_mission_scenarios/configs/myj1.yaml
+  ../capability_mission_scenarios/configs/myj1/myj1.yaml
 ```
 
 配置中的 `output_directory` 决定输出位置。也可以在命令行临时覆盖：
 
 ```bash
 ./build/capability_mission_planner_cli \
-  ../capability_mission_scenarios/configs/myj1.yaml \
+  ../capability_mission_scenarios/configs/myj1/myj1.yaml \
   output/my_run
 ```
 
@@ -207,6 +207,7 @@ planner:
 CLI 输出中的 `timing_*_seconds` 分别对应配置加载、任务规划、文件导出和总耗时。
 在大地图上启用降采样后，`timing_planning_seconds` 通常是最主要的可比较指标；
 最终路线是粗栅格任务级路线，Nav2 执行时必须重新规划。
+
 - `default_transition_seconds`：未单独配置的通道通过时间。
 - `map_switch_seconds`：切换地图的附加时间。
 - `transition_seconds`：按通道类型配置楼梯、电梯等通过时间。
