@@ -9,6 +9,8 @@ map:
   inscribed_radius_m: 0.0
   cost_scaling_factor: 10.0
 output_directory: ../output/example
+export:
+  navigation_checkpoint_types: [start, task, turn, holding, finish]
 planner:
   coordinate_conflicts: true
   objective: {maximum_load_weight: 1.0, total_load_weight: 0.1}

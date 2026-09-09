@@ -218,7 +218,21 @@ CLI 输出中的 `timing_*_seconds` 分别对应配置加载、任务规划、�
 export:
   path_thickness: 3
   draw_grid: false
+  navigation_checkpoint_types: [start, task, turn, holding, finish]
 ```
+
+`navigation_checkpoint_types` 可选，用于筛选导出的
+`navigation_checkpoints`，不影响路径规划、任务分配、返航或冲突协调。未填写时输出
+全部类型；填写空数组 `[]` 时不输出任何导航检查点。可选值为：
+
+```text
+start, task, turn, resource_entry, resource_exit,
+transition_entry, transition_exit, holding, finish
+```
+
+`holding` 仅在多机器人协调确实插入等待时出现，`arrival_tick` 和
+`departure_tick` 分别是等待开始和结束时间步。等待同时保留在 `traffic_events` 中；
+筛选导航检查点不会删除该审计信息。
 
 ## 7. 输出
 
@@ -233,7 +247,8 @@ routes_map_001.png
 ```
 
 - `plan.json`：机器人的任务分配、停靠顺序、负载、栅格/局部/ROOT 坐标，以及
-  面向导航执行的 `navigation_checkpoints` 和冲突等待等 `traffic_events`。
+  面向导航执行的 `navigation_checkpoints` 和冲突等待等 `traffic_events`。等待检查点
+  的类型为 `holding`。
   CBS 内部仍按时间片求解，但导出只保留语义化导航关键点。
 - `summary.txt`：便于人工快速阅读的路线摘要。
 - `routes_<map_id>.png`：在每张原始栅格图上叠加机器人起点、任务编号、通道和

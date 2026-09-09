@@ -36,6 +36,13 @@ CapabilitySet capabilities(const YAML::Node& node, const std::string& name) {
   return result;
 }
 
+bool navigation_checkpoint_type_is_valid(const std::string& value) {
+  static const std::set<std::string> valid{
+    "start", "task", "turn", "resource_entry", "resource_exit",
+    "transition_entry", "transition_exit", "holding", "finish"};
+  return valid.count(value) != 0U;
+}
+
 GridPosition position(
   const YAML::Node& node,
   const MultiMapBundle& bundle,
@@ -239,6 +246,20 @@ ConfiguredMission OfflinePlannerConfigLoader::load_node(
       result.export_options.path_thickness = root["export"]["path_thickness"].as<int>();
     if (root["export"]["draw_grid"])
       result.export_options.draw_grid = root["export"]["draw_grid"].as<bool>();
+    if (root["export"]["navigation_checkpoint_types"]) {
+      const auto types = root["export"]["navigation_checkpoint_types"];
+      if (!types.IsSequence())
+        throw std::runtime_error("export.navigation_checkpoint_types must be a sequence");
+      result.export_options.filter_navigation_checkpoint_types = true;
+      for (const auto& type : types) {
+        if (!type.IsScalar())
+          throw std::runtime_error("export.navigation_checkpoint_types must contain strings");
+        const auto value = type.as<std::string>();
+        if (!navigation_checkpoint_type_is_valid(value))
+          throw std::runtime_error("unknown navigation checkpoint type: " + value);
+        result.export_options.navigation_checkpoint_types.insert(value);
+      }
+    }
     if (result.export_options.path_thickness <= 0)
       throw std::runtime_error("export.path_thickness must be positive");
   }

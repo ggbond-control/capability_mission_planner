@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -359,6 +360,8 @@ private:
 struct ExportOptions {
   int path_thickness = 3;
   bool draw_grid = false;
+  bool filter_navigation_checkpoint_types = false;
+  std::set<std::string> navigation_checkpoint_types;
 };
 
 class PlanExporter {
@@ -367,7 +370,8 @@ public:
     const MultiMapBundle& bundle,
     const std::vector<MappedRobot>& robots,
     const std::vector<MappedTask>& tasks,
-    const OfflineMissionPlan& plan);
+    const OfflineMissionPlan& plan,
+    const ExportOptions& options = {});
   static void write(
     const std::filesystem::path& output_directory,
     const MultiMapBundle& bundle,

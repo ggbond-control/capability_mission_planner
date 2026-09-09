@@ -154,7 +154,7 @@ namespace capability_mission_planner::offline
                         finish(response, false, error_json("PLANNING_FAILED", error.what()));
                         return;
                     }
-                    const auto plan_json = PlanExporter::to_json(*mission.bundle, mission.robots, mission.tasks, plan);
+                    const auto plan_json = PlanExporter::to_json(*mission.bundle, mission.robots, mission.tasks, plan, mission.export_options);
                     std::string response_json = "{\"request_id\":" + quote_json(request_id) + ",\"status\":\"success\",\"plan\":" + plan_json + '}';
                     if (response_json.size() > _max_result_bytes)
                     {

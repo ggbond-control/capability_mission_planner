@@ -90,6 +90,9 @@ string_value: <UTF-8 JSON>
       "downsample_costmap": true,
       "coarse_search_factor": 4
     }
+  },
+  "export": {
+    "navigation_checkpoint_types": ["start", "task", "turn", "holding", "finish"]
   }
 }
 ```
@@ -99,6 +102,12 @@ string_value: <UTF-8 JSON>
 `map.persistent_cache: true` 时，规划器会在地图目录中读取或生成 `.capability_mission_cache`。可以通过 `map.cache_directory` 指定一个单独的缓存目录。
 
 对于多地图任务，`map.directory` 指向整个地图包，机器人和任务位置的 `map_id` 必须是该包中实际存在的地图 ID。
+
+`export.navigation_checkpoint_types` 可选，用于筛选返回的
+`navigation_checkpoints`。未填写时返回全部类型；合法值是 `start`、`task`、`turn`、
+`resource_entry`、`resource_exit`、`transition_entry`、`transition_exit`、`wait`、
+`finish`。它只控制输出，不影响任务分配、路径、冲突协调或 `return_home`。`holding`
+仅在协调器实际安排等待时出现，等待时段由 `arrival_tick` 与 `departure_tick` 给出。
 
 ## 响应
 

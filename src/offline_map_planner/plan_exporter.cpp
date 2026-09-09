@@ -56,15 +56,22 @@ void write_position(std::ostream& output, const GridPosition& position) {
 }
 
 void write_annotations(std::ostream& output, const OfflineMissionPlan& plan,
-  std::size_t robot)
+  std::size_t robot, const ExportOptions& options)
 {
   output << ",\n      \"navigation_checkpoints\": [";
   if (robot < plan.navigation_checkpoints.size()) {
     const auto& points = plan.navigation_checkpoints[robot];
-    for (std::size_t i = 0; i < points.size(); ++i) {
-      const auto& point = points[i];
-      if (i != 0U) output << ',';
-      output << "\n        {\"type\": " << json(checkpoint_type(point.type))
+    bool first = true;
+    for (const auto& point : points) {
+      const auto type = checkpoint_type(point.type);
+      if (options.filter_navigation_checkpoint_types &&
+        options.navigation_checkpoint_types.count(type) == 0U)
+      {
+        continue;
+      }
+      if (!first) output << ',';
+      first = false;
+      output << "\n        {\"type\": " << json(type)
         << ", \"id\": " << json(point.id)
         << ", \"arrival_tick\": " << point.arrival_tick
         << ", \"departure_tick\": " << point.departure_tick << ", ";
@@ -109,7 +116,8 @@ std::string serialize_json(
   const MultiMapBundle& bundle,
   const std::vector<MappedRobot>& robots,
   const std::vector<MappedTask>& tasks,
-  const OfflineMissionPlan& plan)
+  const OfflineMissionPlan& plan,
+  const ExportOptions& options)
 {
   std::ostringstream output;
   output << std::setprecision(10);
@@ -157,7 +165,7 @@ std::string serialize_json(
       output << "]}";
     }
     output << "\n      ]";
-    write_annotations(output, plan, route.robot_index);
+    write_annotations(output, plan, route.robot_index, options);
     output << "\n    }";
     if (route_index + 1U != plan.routes.size()) output << ',';
     output << '\n';
@@ -206,9 +214,10 @@ std::string PlanExporter::to_json(
   const MultiMapBundle& bundle,
   const std::vector<MappedRobot>& robots,
   const std::vector<MappedTask>& tasks,
-  const OfflineMissionPlan& plan)
+  const OfflineMissionPlan& plan,
+  const ExportOptions& options)
 {
-  return serialize_json(bundle, robots, tasks, plan);
+  return serialize_json(bundle, robots, tasks, plan, options);
 }
 
 void PlanExporter::write(
@@ -223,7 +232,7 @@ void PlanExporter::write(
   std::ofstream json_output(output_directory / "plan.json");
   if (!json_output)
     throw std::runtime_error("cannot write " + (output_directory / "plan.json").string());
-  json_output << serialize_json(bundle, robots, tasks, plan);
+  json_output << serialize_json(bundle, robots, tasks, plan, options);
   write_summary(output_directory / "summary.txt", bundle, robots, tasks, plan);
 
   std::vector<std::size_t> owner(tasks.size(), robots.size());
