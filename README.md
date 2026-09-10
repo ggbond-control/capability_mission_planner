@@ -24,12 +24,6 @@ cmake --build build --parallel
 ctest --test-dir build --output-on-failure
 ```
 
-Run the 4-robot, 20-point, 40-atomic-task example with:
-
-```bash
-./build/mission_demo > mission_plan.json
-```
-
 Validate planning on a PNG occupancy map and render the result with:
 
 ```bash

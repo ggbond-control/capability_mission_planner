@@ -22,13 +22,9 @@ add_library(capability_mission_planner
   src/task_metadata.cpp)
 
 target_include_directories(capability_mission_planner
-  PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 
 target_compile_options(capability_mission_planner PRIVATE -Wall -Wextra -Wpedantic)
-
-add_executable(mission_demo examples/mission_demo.cpp)
-target_link_libraries(mission_demo PRIVATE capability_mission_planner)
 
 if(BUILD_OFFLINE_MAP_ADAPTER)
   find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc)

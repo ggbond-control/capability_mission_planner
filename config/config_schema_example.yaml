@@ -4,9 +4,12 @@ map:
   inflation_radius_m: 0.0
   inscribed_radius_m: 0.0
   cost_scaling_factor: 10.0
+
 output_directory: ../output/example
+
 export:
   navigation_checkpoint_types: [start, task, turn, holding, finish]
+
 planner:
   coordinate_conflicts: true
   objective:
@@ -20,6 +23,7 @@ planner:
     downsample_costmap: false
     coarse_search_factor: 1
     resource_buffer_seconds: 0.5
+
 robots:
   - id: robot_a
     start:
@@ -33,6 +37,7 @@ robots:
     safety_margin_m: 0.10
     footprint_radius_m: 0.5
     nominal_speed_mps: 0.5
+
 tasks:
   - id: task_1
     location:
