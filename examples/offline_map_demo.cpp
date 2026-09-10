@@ -166,9 +166,9 @@ int main(int argc, char* argv[]) {
       : spread_points(*bundle, last, 2);
 
     std::vector<MappedRobot> robots{
-      {"a", starts[0], {"fire", "camera", "stairs"}, true},
-      {"b", starts[1], {"camera", "thermal", "stairs"}, true},
-      {"c", starts[2], {"fire", "camera", "thermal", "stairs"}, true}};
+      {"a", starts[0], {"fire", "camera", "stairs"}, starts[0]},
+      {"b", starts[1], {"camera", "thermal", "stairs"}, starts[1]},
+      {"c", starts[2], {"fire", "camera", "thermal", "stairs"}, starts[2]}};
     std::vector<MappedTask> tasks{
       make_mapped_task("T1-photo", first_points[3], {"camera"}, "gimbal_photo", 2, true),
       make_mapped_task("T2-fire", first_points[3], {"fire"}, "fire_suppression", 4),

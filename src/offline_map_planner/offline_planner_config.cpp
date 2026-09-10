@@ -43,7 +43,12 @@ bool navigation_checkpoint_type_is_valid(const std::string& value) {
   return valid.count(value) != 0U;
 }
 
-GridPosition position(
+struct ParsedPosition {
+  GridPosition grid;
+  CoordinateRepresentation representation = CoordinateRepresentation::Grid;
+};
+
+ParsedPosition position(
   const YAML::Node& node,
   const MultiMapBundle& bundle,
   const std::string& name,
@@ -58,21 +63,27 @@ GridPosition position(
   if (representations != 1)
     throw std::runtime_error(name + " must contain exactly one of grid, local_xy, root_xy");
 
-  GridPosition result;
+  ParsedPosition parsed;
   if (node["grid"]) {
     const auto value = node["grid"];
     if (!value.IsSequence() || value.size() != 2U)
       throw std::runtime_error(name + ".grid must contain [x, y]");
-    result = {map_id, value[0].as<int>(), value[1].as<int>()};
+    parsed.grid = {map_id, value[0].as<int>(), value[1].as<int>()};
+    parsed.representation = CoordinateRepresentation::Grid;
   } else {
-    const auto key = node["local_xy"] ? "local_xy" : "root_xy";
+    const bool is_root = !!node["root_xy"];
+    const char* key = is_root ? "root_xy" : "local_xy";
     const auto value = node[key];
     if (!value.IsSequence() || value.size() != 2U)
       throw std::runtime_error(name + "." + key + " must contain [x, y] in metres");
     MetricPose pose{map_id, value[0].as<double>(), value[1].as<double>()};
-    if (node["root_xy"]) pose = map.root_to_local(pose);
-    result = map.local_to_grid(pose.x, pose.y);
+    if (is_root) pose = map.root_to_local(pose);
+    parsed.grid = map.local_to_grid(pose.x, pose.y);
+    parsed.representation = is_root ? CoordinateRepresentation::RootXY :
+      CoordinateRepresentation::LocalXY;
   }
+
+  GridPosition& result = parsed.grid;
   if (!bundle.traversable(result)) {
     if (tolerance_m <= 0.0)
       throw std::runtime_error(name + " resolves to a blocked or out-of-map cell");
@@ -95,7 +106,7 @@ GridPosition position(
       throw std::runtime_error(name + " has no traversable cell within tolerance");
     result = best;
   }
-  return result;
+  return parsed;
 }
 
 void load_traversal(const YAML::Node& node, TraversalOptions& options) {
@@ -154,21 +165,17 @@ ConfiguredMission OfflinePlannerConfigLoader::load(
 {
   const auto config_path = std::filesystem::absolute(raw_config_path).lexically_normal();
   const auto root = YAML::LoadFile(config_path.string());
-  return load_node(root, config_path, true);
+  return load_node(root, config_path);
 }
 
 ConfiguredMission OfflinePlannerConfigLoader::load_node(
   const YAML::Node& root,
-  const std::filesystem::path& raw_base_path,
-  bool require_output_directory)
+  const std::filesystem::path& raw_base_path)
 {
   const auto base_path = raw_base_path.empty() ?
     std::filesystem::current_path() / "inline_mission.yaml" :
     std::filesystem::absolute(raw_base_path).lexically_normal();
   require_map(root, "configuration root");
-  if (root["version"] && root["version"].as<int>() != 1)
-    throw std::runtime_error("unsupported configuration version");
-
   require_map(root["map"], "map");
   if (!root["map"]["directory"])
     throw std::runtime_error("map.directory is required");
@@ -194,11 +201,11 @@ ConfiguredMission OfflinePlannerConfigLoader::load_node(
   ConfiguredMission result;
   result.bundle = MapBundleLoader::load(
     resolve_path(base_path, root["map"]["directory"].as<std::string>()), map_options);
-  if (require_output_directory && !root["output_directory"])
-    throw std::runtime_error("output_directory is required");
   if (root["output_directory"])
     result.output_directory = resolve_path(
       base_path, root["output_directory"].as<std::string>());
+  else
+    result.output_directory = base_path.parent_path();
 
   const auto planner = root["planner"];
   if (planner) require_map(planner, "planner");
@@ -271,14 +278,23 @@ ConfiguredMission OfflinePlannerConfigLoader::load_node(
     require_map(node, "robot");
     if (!node["id"] || !node["start"] || !node["capabilities"])
       throw std::runtime_error("each robot requires id, start, and capabilities");
+    const auto start = position(node["start"], *result.bundle, "robot start");
+    std::optional<GridPosition> return_position;
+    if (node["return_home"]) {
+      if (!node["return_home"].IsMap())
+        throw std::runtime_error("robot return_home must be a coordinate map");
+      return_position = position(
+        node["return_home"], *result.bundle, "robot return_home").grid;
+    }
     result.robots.push_back({node["id"].as<std::string>(),
-      position(node["start"], *result.bundle, "robot start"),
+      start.grid,
       capabilities(node["capabilities"], "robot capabilities"),
-      node["return_home"] ? node["return_home"].as<bool>() : true,
+      return_position,
       node["clearance_radius_m"] ? node["clearance_radius_m"].as<double>() : 0.0,
       node["safety_margin_m"] ? node["safety_margin_m"].as<double>() : 0.0,
       node["nominal_speed_mps"] ? node["nominal_speed_mps"].as<double>() : 0.0,
-      node["footprint_radius_m"] ? node["footprint_radius_m"].as<double>() : 0.0});
+      node["footprint_radius_m"] ? node["footprint_radius_m"].as<double>() : 0.0,
+      start.representation});
     if (result.robots.back().clearance_radius_m < 0.0 ||
       result.robots.back().safety_margin_m < 0.0 ||
       result.robots.back().nominal_speed_mps < 0.0 ||
@@ -302,13 +318,16 @@ ConfiguredMission OfflinePlannerConfigLoader::load_node(
       (node["location"]["position_tolerance_m"] ?
         node["location"]["position_tolerance_m"].as<double>() : 0.0);
     if (tolerance < 0.0) throw std::runtime_error("task position tolerance must be non-negative");
+    const auto location = position(
+      node["location"], *result.bundle, "task location", tolerance);
     auto task = make_mapped_task(
       node["id"].as<std::string>(),
-      position(node["location"], *result.bundle, "task location", tolerance),
+      location.grid,
       capabilities(node["requirements"], "task requirements"),
       node["category"].as<std::string>(), node["service_seconds"].as<int>(),
       node["high_priority"] ? node["high_priority"].as<bool>() : false);
     task.position_tolerance_m = tolerance;
+    task.coordinate_representation = location.representation;
     result.tasks.push_back(std::move(task));
   }
   return result;

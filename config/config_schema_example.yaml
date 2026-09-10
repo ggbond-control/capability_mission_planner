@@ -1,7 +1,3 @@
-version: 1
-
-# This is a schema/example only. Real maps and mission files live in the
-# capability_mission_scenarios repository.
 map:
   directory: /path/to/map_bundle
   allow_unknown: false
@@ -13,7 +9,9 @@ export:
   navigation_checkpoint_types: [start, task, turn, holding, finish]
 planner:
   coordinate_conflicts: true
-  objective: {maximum_load_weight: 1.0, total_load_weight: 0.1}
+  objective:
+    maximum_load_weight: 1.0
+    total_load_weight: 0.1
   traversal:
     time_step_seconds: 0.1
     nominal_speed_mps: 0.5
@@ -24,16 +22,22 @@ planner:
     resource_buffer_seconds: 0.5
 robots:
   - id: robot_a
-    start: {map_id: map_000, grid: [10, 10]}
+    start:
+      map_id: map_000
+      local_xy: [0.525, 0.525]
     capabilities: [camera]
-    return_home: true
+    return_home:
+      map_id: map_000
+      local_xy: [0.525, 0.525]
     clearance_radius_m: 0.25
     safety_margin_m: 0.10
     footprint_radius_m: 0.5
     nominal_speed_mps: 0.5
 tasks:
   - id: task_1
-    location: {map_id: map_000, grid: [20, 20]}
+    location:
+      map_id: map_000
+      local_xy: [1.025, 1.025]
     requirements: [camera]
     category: gimbal_photo
     service_seconds: 2

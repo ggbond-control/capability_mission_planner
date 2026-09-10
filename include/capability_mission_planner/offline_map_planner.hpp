@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <vector>
@@ -27,6 +28,12 @@ struct MetricPose {
   double y = 0.0;
   double z = 0.0;
   double yaw = 0.0;
+};
+
+enum class CoordinateRepresentation {
+  Grid,
+  LocalXY,
+  RootXY
 };
 
 struct MapLayer {
@@ -245,11 +252,12 @@ struct MappedRobot {
   std::string id;
   GridPosition start;
   CapabilitySet capabilities;
-  bool return_home = true;
+  std::optional<GridPosition> return_position;
   double clearance_radius_m = 0.0;
   double safety_margin_m = 0.0;
   double nominal_speed_mps = 0.0;
   double footprint_radius_m = 0.0;
+  CoordinateRepresentation coordinate_representation = CoordinateRepresentation::Grid;
 };
 
 struct MappedTask {
@@ -258,6 +266,7 @@ struct MappedTask {
   GridPosition location;
   CapabilitySet requirements;
   double position_tolerance_m = 0.0;
+  CoordinateRepresentation coordinate_representation = CoordinateRepresentation::Grid;
 
   const std::string& id() const { return booking->id(); }
   int service_duration_seconds() const;

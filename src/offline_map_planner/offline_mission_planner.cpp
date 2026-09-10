@@ -43,10 +43,10 @@ void recompute_route(
     route.segments.push_back(path);
     current = stop.location;
   }
-  if (robot.return_home && !route.stops.empty()) {
+  if (robot.return_position && !route.stops.empty()) {
     const auto path = exact_paths ?
-      planner.plan_exact(current, robot.start, robot.capabilities, clearance, speed) :
-      planner.plan(current, robot.start, robot.capabilities, clearance, speed);
+      planner.plan_exact(current, *robot.return_position, robot.capabilities, clearance, speed) :
+      planner.plan(current, *robot.return_position, robot.capabilities, clearance, speed);
     route.travel_ticks += path.travel_ticks;
     route.segments.push_back(path);
   }
@@ -108,8 +108,8 @@ struct RouteState {
       route.service_ticks += stop.service_ticks;
       current = stop.location;
     }
-    if (robot->return_home && !route.stops.empty()) {
-      const int value = edge(current, robot->start);
+    if (robot->return_position && !route.stops.empty()) {
+      const int value = edge(current, *robot->return_position);
       edges.push_back(value);
       route.travel_ticks += value;
     }
@@ -120,16 +120,16 @@ struct RouteState {
     result.route.stops.insert(result.route.stops.begin() + static_cast<std::ptrdiff_t>(position), stop);
     const GridPosition prev = position == 0U ? robot->start : route.stops[position - 1U].location;
     const GridPosition next = position == route.stops.size() ?
-      (robot->return_home ? robot->start : GridPosition{}) : route.stops[position].location;
+      (robot->return_position ? *robot->return_position : GridPosition{}) : route.stops[position].location;
     const int old_edge = position < edges.size() ? edges[position] : 0;
     const int first = result.edge(prev, stop.location);
-    const int second = (position == route.stops.size() && !robot->return_home) ? 0 :
+    const int second = (position == route.stops.size() && !robot->return_position) ? 0 :
       result.edge(stop.location, next);
     result.route.travel_ticks += first + second - old_edge;
     result.route.service_ticks += stop.service_ticks;
     result.edges.insert(result.edges.begin() + static_cast<std::ptrdiff_t>(position), first);
     if (position < edges.size()) result.edges[position + 1U] = second;
-    else if (robot->return_home) result.edges.push_back(second);
+    else if (robot->return_position) result.edges.push_back(second);
     return result;
   }
 
@@ -468,6 +468,9 @@ OfflineMissionPlan OfflineMissionPlanner::plan(
       throw std::invalid_argument("duplicate robot id: " + robot.id);
     if (!_path_planner.bundle().traversable(robot.start))
       throw std::invalid_argument("robot start is not traversable: " + robot.id);
+    if (robot.return_position &&
+      !_path_planner.bundle().traversable(*robot.return_position))
+      throw std::invalid_argument("robot return_home is not traversable: " + robot.id);
     if (!starts.insert(robot.start).second)
       throw std::invalid_argument("robots cannot share an initial location");
   }
@@ -498,6 +501,9 @@ OfflineMissionPlan OfflineMissionPlanner::plan(
       estimate_positions.push_back(position);
   };
   for (const auto& robot : robots) add_position(robot.start);
+  for (const auto& robot : robots) {
+    if (robot.return_position) add_position(*robot.return_position);
+  }
   for (const auto& task : tasks) add_position(task.location);
   std::vector<PathQueryProfile> estimate_profiles;
   estimate_profiles.reserve(robots.size());

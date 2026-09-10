@@ -2,6 +2,7 @@
 #include <capability_mission_planner/offline_planner_config.hpp>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -111,8 +112,8 @@ void check_multi_map_planning(const std::shared_ptr<const MultiMapBundle>& bundl
 
   const auto second_start = different_free_cell(*bundle, transition.from_cell);
   std::vector<MappedRobot> robots{
-    {"mission_robot", transition.from_cell, {"camera", "fire", "stairs"}, true},
-    {"idle_robot", second_start, {"thermal"}, true}};
+    {"mission_robot", transition.from_cell, {"camera", "fire", "stairs"}, transition.from_cell},
+    {"idle_robot", second_start, {"thermal"}, second_start}};
   std::vector<MappedTask> tasks{
     make_mapped_task("photo", transition.to_cell, {"camera"}, "photo", 1),
     make_mapped_task("fire", transition.to_cell, {"fire"}, "fire", 1)};
@@ -200,17 +201,18 @@ void check_task_tolerance_projection(
 
   const auto config_path = std::filesystem::temp_directory_path() /
     "capability_mission_planner_tolerance_test.yaml";
+  const auto nearby_xy = map.grid_to_local(nearby_free);
+  const auto blocked_xy = map.grid_to_local(blocked);
   std::ofstream config(config_path);
   require(config.good(), "could not create tolerance test config");
-  config << "version: 1\n"
-    << "map:\n  directory: " << map_directory.string() << "\n"
+  config << "map:\n  directory: " << map_directory.string() << "\n"
     << "output_directory: tolerance-output\n"
     << "planner:\n  traversal: {}\n"
     << "robots:\n  - id: test\n    start:\n      map_id: " << map.id
-    << "\n      grid: [" << nearby_free.x << ", " << nearby_free.y << "]\n"
-    << "    capabilities: [camera]\n    return_home: false\n"
+    << "\n      local_xy: [" << nearby_xy.x << ", " << nearby_xy.y << "]\n"
+    << "    capabilities: [camera]\n"
     << "tasks:\n  - id: tolerant\n    location:\n      map_id: " << map.id
-    << "\n      grid: [" << blocked.x << ", " << blocked.y << "]\n"
+    << "\n      local_xy: [" << blocked_xy.x << ", " << blocked_xy.y << "]\n"
     << "    position_tolerance_m: " << (3.0 * map.resolution) << "\n"
     << "    requirements: [camera]\n    category: photo\n    service_seconds: 1\n";
   config.close();
@@ -226,6 +228,139 @@ void check_task_tolerance_projection(
   std::filesystem::remove(config_path);
 }
 
+void check_minimal_configuration_defaults(
+  const std::string& map_directory, const std::shared_ptr<const MultiMapBundle>& bundle)
+{
+  const auto& map = bundle->maps.begin()->second;
+  GridPosition sample;
+  bool found = false;
+  for (int y = 0; y < map.height && !found; ++y) {
+    for (int x = 0; x < map.width; ++x) {
+      if (!map.is_traversable(x, y)) continue;
+      sample = {map.id, x, y};
+      found = true;
+      break;
+    }
+  }
+  require(found, "could not find a traversable cell for minimal configuration");
+  const auto local = map.grid_to_local(sample);
+  const auto config_path = std::filesystem::temp_directory_path() /
+    "capability_mission_planner_minimal.yaml";
+  std::ofstream config(config_path);
+  require(config.good(), "could not create minimal configuration");
+  config << "map:\n  directory: " << map_directory << "\n"
+    << "robots:\n  - id: test\n    start: {map_id: " << map.id
+    << ", local_xy: [" << local.x << ", " << local.y << "]}\n"
+    << "    capabilities: [camera]\n"
+    << "tasks:\n  - id: task\n    location: {map_id: " << map.id
+    << ", local_xy: [" << local.x << ", " << local.y << "]}\n"
+    << "    requirements: [camera]\n    category: photo\n    service_seconds: 1\n";
+  config.close();
+
+  const auto loaded = OfflinePlannerConfigLoader::load(config_path);
+  require(loaded.output_directory == config_path.parent_path(),
+    "minimal configuration did not use its parent directory for output");
+  require(loaded.traversal.time_step_seconds == 0.1 &&
+    loaded.traversal.nominal_speed_mps == 0.5 &&
+    loaded.objective.maximum_load == 1.0 && loaded.objective.total_load == 0.1 &&
+    loaded.coordinate_conflicts && loaded.export_options.path_thickness == 3 &&
+    !loaded.export_options.draw_grid && !loaded.export_options.filter_navigation_checkpoint_types,
+    "minimal configuration did not preserve planner defaults");
+  require(!loaded.robots.front().return_position &&
+    loaded.robots.front().clearance_radius_m == 0.0 &&
+    loaded.robots.front().safety_margin_m == 0.0 &&
+    loaded.robots.front().nominal_speed_mps == 0.0 &&
+    loaded.robots.front().footprint_radius_m == 0.0 &&
+    !loaded.tasks.front().high_priority() &&
+    loaded.tasks.front().position_tolerance_m == 0.0,
+    "minimal configuration did not preserve robot or task defaults");
+
+  std::ofstream invalid(config_path);
+  require(invalid.good(), "could not create invalid return_home configuration");
+  invalid << "map:\n  directory: " << map_directory << "\n"
+    << "robots:\n  - id: test\n    start: {map_id: " << map.id
+    << ", local_xy: [" << local.x << ", " << local.y << "]}\n"
+    << "    capabilities: [camera]\n    return_home: true\n"
+    << "tasks:\n  - id: task\n    location: {map_id: " << map.id
+    << ", local_xy: [" << local.x << ", " << local.y << "]}\n"
+    << "    requirements: [camera]\n    category: photo\n    service_seconds: 1\n";
+  invalid.close();
+  bool rejected = false;
+  try {
+    (void)OfflinePlannerConfigLoader::load(config_path);
+  } catch (const std::runtime_error& error) {
+    rejected = std::string(error.what()).find("return_home") != std::string::npos;
+  }
+  require(rejected, "boolean return_home was not rejected");
+  std::filesystem::remove(config_path);
+}
+
+void check_coordinate_representations(
+  const std::string& map_directory, const std::shared_ptr<const MultiMapBundle>& bundle)
+{
+  const auto& map = bundle->maps.begin()->second;
+  GridPosition sample;
+  GridPosition home;
+  bool found_connected_pair = false;
+  for (int y = 0; y < map.height && !found_connected_pair; ++y) {
+    for (int x = 0; x + 1 < map.width; ++x) {
+      const GridPosition first{map.id, x, y};
+      const GridPosition second{map.id, x + 1, y};
+      if (bundle->traversable(first) && bundle->traversable(second)) {
+        sample = first;
+        home = second;
+        found_connected_pair = true;
+        break;
+      }
+    }
+  }
+  require(found_connected_pair, "could not find a connected return_home test position");
+  const auto local = map.grid_to_local(sample);
+  const auto root = map.local_to_root(local);
+  const auto home_local = map.grid_to_local(home);
+  const auto home_root = map.local_to_root(home_local);
+  const std::array<std::string, 3> keys{"grid", "local_xy", "root_xy"};
+  const std::array<std::string, 3> values{
+    "[" + std::to_string(sample.x) + ", " + std::to_string(sample.y) + "]",
+    "[" + std::to_string(local.x) + ", " + std::to_string(local.y) + "]",
+    "[" + std::to_string(root.x) + ", " + std::to_string(root.y) + "]"};
+  const std::array<std::string, 3> home_values{
+    "[" + std::to_string(home.x) + ", " + std::to_string(home.y) + "]",
+    "[" + std::to_string(home_local.x) + ", " + std::to_string(home_local.y) + "]",
+    "[" + std::to_string(home_root.x) + ", " + std::to_string(home_root.y) + "]"};
+  for (std::size_t i = 0; i < keys.size(); ++i) {
+    const auto config_path = std::filesystem::temp_directory_path() /
+      ("capability_mission_planner_coordinate_" + keys[i] + ".yaml");
+    std::ofstream config(config_path);
+    require(config.good(), "could not create coordinate representation config");
+    config << "map:\n  directory: " << map_directory << "\n"
+      << "output_directory: coordinate-output\n"
+      << "robots:\n  - id: test\n    start:\n      map_id: " << map.id
+      << "\n      " << keys[i] << ": " << values[i]
+      << "\n    capabilities: [camera]\n    return_home:\n      map_id: " << map.id
+      << "\n      " << keys[i] << ": " << home_values[i] << "\n"
+      << "tasks:\n  - id: task\n    location:\n      map_id: " << map.id
+      << "\n      " << keys[i] << ": " << values[i]
+      << "\n    requirements: [camera]\n    category: photo\n    service_seconds: 1\n";
+    config.close();
+    const auto loaded = OfflinePlannerConfigLoader::load(config_path);
+    require(loaded.robots.front().start == sample,
+      "coordinate representation did not resolve to the expected cell");
+    require(loaded.tasks.front().location == sample,
+      "task coordinate representation did not resolve to the expected cell");
+    const auto plan = OfflineMissionPlanner(
+      MultiMapPathPlanner(loaded.bundle)).plan(loaded.robots, loaded.tasks, false);
+    require(!plan.routes.front().segments.empty() &&
+      plan.routes.front().segments.back().steps.back().position == home,
+      "route did not finish at the configured return_home position");
+    const auto output = PlanExporter::to_json(
+      *loaded.bundle, loaded.robots, loaded.tasks, plan);
+    require(output.find("\"" + keys[i] + "\"") != std::string::npos,
+      "export did not preserve coordinate representation " + keys[i]);
+    std::filesystem::remove(config_path);
+  }
+}
+
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -239,6 +374,8 @@ int main(int argc, char* argv[]) {
     check_multi_map_planning(multi);
     check_task_level_navigation_costs(single);
     check_task_tolerance_projection(argv[1], single);
+    check_minimal_configuration_defaults(argv[1], single);
+    check_coordinate_representations(argv[1], single);
     std::cout << "offline adapter tests passed\n";
     return 0;
   } catch (const std::exception& error) {

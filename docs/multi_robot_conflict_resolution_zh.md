@@ -149,7 +149,7 @@ CBS 内部仍按逐时间片状态进行冲突检测。导出到 `plan.json` 时
 
 ```json
 {"type": "turn", "arrival_tick": 3,
- "map_id": "map_000", "grid": [10, 20]}
+ "map_id": "map_000", "local_xy": [0.525, 1.025]}
 ```
 
 这只改变序列化体积，不改变 CBS 内部的离散时间冲突判断。

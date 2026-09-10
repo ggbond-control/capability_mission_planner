@@ -50,13 +50,32 @@ const char* checkpoint_type(NavigationCheckpointType type) {
   return "unknown";
 }
 
-void write_position(std::ostream& output, const GridPosition& position) {
-  output << "\"map_id\": " << json(position.map_id)
-    << ", \"grid\": [" << position.x << ", " << position.y << "]";
+void write_position(std::ostream& output, const MultiMapBundle& bundle,
+  const GridPosition& position, CoordinateRepresentation representation) {
+  const auto& map = bundle.map(position.map_id);
+  output << "\"map_id\": " << json(position.map_id) << ", ";
+  switch (representation) {
+    case CoordinateRepresentation::Grid:
+      output << "\"grid\": [" << position.x << ", " << position.y << "]";
+      break;
+    case CoordinateRepresentation::RootXY: {
+      const auto local = map.grid_to_local(position);
+      const auto root = map.local_to_root(local);
+      output << "\"root_xy\": [" << root.x << ", " << root.y << "]";
+      break;
+    }
+    case CoordinateRepresentation::LocalXY:
+    default: {
+      const auto local = map.grid_to_local(position);
+      output << "\"local_xy\": [" << local.x << ", " << local.y << "]";
+      break;
+    }
+  }
 }
 
-void write_annotations(std::ostream& output, const OfflineMissionPlan& plan,
-  std::size_t robot, const ExportOptions& options)
+void write_annotations(std::ostream& output, const MultiMapBundle& bundle,
+  const std::vector<MappedRobot>& robots, const std::vector<MappedTask>& tasks,
+  const OfflineMissionPlan& plan, std::size_t robot, const ExportOptions& options)
 {
   output << ",\n      \"navigation_checkpoints\": [";
   if (robot < plan.navigation_checkpoints.size()) {
@@ -75,7 +94,16 @@ void write_annotations(std::ostream& output, const OfflineMissionPlan& plan,
         << ", \"id\": " << json(point.id)
         << ", \"arrival_tick\": " << point.arrival_tick
         << ", \"departure_tick\": " << point.departure_tick << ", ";
-      write_position(output, point.position);
+      auto representation = robots[robot].coordinate_representation;
+      if (!point.task_id.empty()) {
+        for (const auto& task : tasks) {
+          if (task.id() == point.task_id) {
+            representation = task.coordinate_representation;
+            break;
+          }
+        }
+      }
+      write_position(output, bundle, point.position, representation);
       if (!point.task_id.empty()) output << ", \"task\": " << json(point.task_id);
       if (!point.transition_id.empty())
         output << ", \"transition_id\": " << json(point.transition_id);
@@ -93,7 +121,8 @@ void write_annotations(std::ostream& output, const OfflineMissionPlan& plan,
         << ", \"checkpoint_id\": " << json(event.checkpoint_id)
         << ", \"start_tick\": " << event.start_tick
         << ", \"end_tick\": " << event.end_tick << ", ";
-      write_position(output, event.position);
+      write_position(output, bundle, event.position,
+        robots[robot].coordinate_representation);
       if (!event.resource.empty()) output << ", \"resource\": " << json(event.resource);
       output << ", \"reason\": " << json(event.reason) << "}";
     }
@@ -150,13 +179,12 @@ std::string serialize_json(
     for (std::size_t stop_index = 0; stop_index < route.stops.size(); ++stop_index) {
       const auto& stop = route.stops[stop_index];
       if (stop_index != 0U) output << ',';
-      const auto local = bundle.map(stop.location.map_id).grid_to_local(stop.location);
-      const auto root = bundle.map(stop.location.map_id).local_to_root(local);
-      output << "\n        {\"map_id\": " << json(stop.location.map_id)
-             << ", \"grid\": [" << stop.location.x << ", " << stop.location.y
-             << "], \"local_xy\": [" << local.x << ", " << local.y
-             << "], \"root_xy\": [" << root.x << ", " << root.y
-             << "], \"position_tolerance_m\": " << stop.position_tolerance_m
+      CoordinateRepresentation representation = robot.coordinate_representation;
+      if (!stop.task_indices.empty() && stop.task_indices.front() < tasks.size())
+        representation = tasks[stop.task_indices.front()].coordinate_representation;
+      output << "\n        {";
+      write_position(output, bundle, stop.location, representation);
+      output << ", \"position_tolerance_m\": " << stop.position_tolerance_m
              << ", \"service_ticks\": " << stop.service_ticks << ", \"tasks\": [";
       for (std::size_t i = 0; i < stop.task_indices.size(); ++i) {
         if (i != 0U) output << ", ";
@@ -165,7 +193,7 @@ std::string serialize_json(
       output << "]}";
     }
     output << "\n      ]";
-    write_annotations(output, plan, route.robot_index, options);
+    write_annotations(output, bundle, robots, tasks, plan, route.robot_index, options);
     output << "\n    }";
     if (route_index + 1U != plan.routes.size()) output << ',';
     output << '\n';
@@ -197,8 +225,9 @@ void write_summary(
            << route.service_ticks * plan.time_step_seconds << "s stops="
            << route.stops.size() << '\n';
     for (const auto& stop : route.stops) {
-      output << "  " << stop.location.map_id << " grid(" << stop.location.x
-             << ',' << stop.location.y << ") tasks=";
+      const auto local = bundle.map(stop.location.map_id).grid_to_local(stop.location);
+      output << "  " << stop.location.map_id << " xy(" << local.x
+             << ',' << local.y << ") tasks=";
       for (std::size_t i = 0; i < stop.task_indices.size(); ++i) {
         if (i != 0U) output << ',';
         output << tasks[stop.task_indices[i]].id();

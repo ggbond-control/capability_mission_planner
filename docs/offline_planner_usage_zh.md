@@ -26,7 +26,9 @@ ctest --test-dir build --output-on-failure
   ../capability_mission_scenarios/configs/myj1/myj1.yaml
 ```
 
-配置中的 `output_directory` 决定输出位置。也可以在命令行临时覆盖：
+配置中的 `output_directory` 可选，用于指定输出位置。未填写时，结果直接写到输入 YAML
+所在目录，例如 `temp/myj1.yaml` 会生成 `temp/plan.json`、`temp/summary.txt` 和
+`temp/routes_<map_id>.png`；同名文件会被覆盖。也可以在命令行临时覆盖：
 
 ```bash
 ./build/capability_mission_planner_cli \
@@ -37,7 +39,30 @@ ctest --test-dir build --output-on-failure
 配置文件中的相对路径以配置文件所在目录为基准，命令行覆盖的输出路径以当前工作
 目录为基准。
 
-## 3. 地图输入
+## 3. 最小任务输入
+
+任务规划桥下发的 YAML 只需包含地图目录、机器人和原子任务：
+
+```yaml
+map:
+  directory: /data/maps/myj1
+robots:
+  - id: robot_a
+    start: {map_id: map_000, local_xy: [1.25, 1.25]}
+    capabilities: [fire, camera, stairs]
+tasks:
+  - id: task_001
+    location: {map_id: map_000, local_xy: [2.25, 1.25]}
+    requirements: [camera]
+    category: gimbal_photo
+    service_seconds: 2
+```
+
+`tasks` 是原子任务列表，`location` 是任务的执行位置；不同任务可以共享同一位置，规划器
+会在需要时将其合并为一个停靠点。未填写的地图、规划器、导出、机器人和任务可选参数
+均使用内置默认值。
+
+## 4. 地图输入
 
 单地图目录包含一组标准 Nav2 YAML 和图像：
 
@@ -78,16 +103,20 @@ map:
   `.capability_mission_cache/`。缓存使用地图 YAML/PNG 的文件大小和修改时间及地图
   参数校验；任一项变化时自动重建。
 
-## 4. 机器人和任务输入
+## 5. 机器人和任务输入
 
 每台机器人配置起点、能力和是否返航：
 
 ```yaml
 robots:
   - id: a
-    start: {map_id: map_000, grid: [409, 392]}
+    start:
+      map_id: map_000
+      local_xy: [1.25, 1.25]
     capabilities: [fire, camera, stairs]
-    return_home: true
+    return_home:
+      map_id: map_000
+      local_xy: [1.25, 1.25]
     clearance_radius_m: 0.35
     safety_margin_m: 0.10
     nominal_speed_mps: 0.5
@@ -98,13 +127,17 @@ robots:
 ```yaml
 tasks:
   - id: T1-photo
-    location: {map_id: map_000, grid: [278, 481]}
+    location: {map_id: map_000, local_xy: [1.25, 1.25]}
     requirements: [camera]
     category: gimbal_photo
     service_seconds: 2
     high_priority: true
     position_tolerance_m: 0.5
 ```
+
+未配置 `return_home` 时，路线在最后一个任务点结束；配置 `return_home` 坐标对象时，
+路线会在完成任务后前往该坐标（适合配置充电桩）。该字段必须同时包含 `map_id` 和
+`grid`、`local_xy`、`root_xy` 三者之一，不再接受布尔值。
 
 机器人数量和任务数量不要求相等。一台机器人可以获得零个、一个或多个任务。同一
 位置的多个任务如果分给同一台机器人，会合并为一个停靠点。
@@ -117,42 +150,36 @@ tasks:
 `[fire, camera]` 的任务不能交给只有 `fire` 能力的机器人。跨楼梯所需的
 `stairs` 能力也会独立检查。
 
-## 5. 位置坐标
+## 6. 位置坐标
 
 每个位置必须给出 `map_id`，并且只使用以下三种坐标表示之一。
 
-规划栅格坐标：
+规划栅格坐标（整数）：
 
 ```yaml
 location: {map_id: map_003, grid: [358, 336]}
 ```
 
-该地图自身的 Nav2 局部坐标，单位为米：
+地图自身 Nav2 局部坐标（米）：
 
 ```yaml
 location: {map_id: map_003, local_xy: [1.25, -0.40]}
 ```
 
-所有地图共用的 ROOT 平面坐标，单位为米；`map_id` 用于确定该位置属于哪张占据
-栅格：
+所有地图共用的 ROOT 平面坐标（米）：
 
 ```yaml
 location: {map_id: map_003, root_xy: [4.10, 0.99]}
 ```
 
-PNG 左上角坐标不能直接填入 `grid`。规划栅格原点位于左下角，转换关系为：
-
-```text
-grid_x = image_column
-grid_y = image_height - 1 - image_row
-```
-
-配置加载时会检查位置是否越界或落在障碍物上。
+规划器会将位置转换为内部栅格单元，并检查是否越界或落在障碍物上。导出的 JSON
+使用每个位置对应输入字段：`grid`、`local_xy` 或 `root_xy`。场景示例统一采用
+`local_xy`，但三种格式均保持兼容。
 
 `position_tolerance_m` 允许任务点在给定半径内投影到最近的可达栅格，输出给 Nav2
 时可作为目标位置容差。
 
-## 6. 算法参数
+## 7. 算法参数
 
 ```yaml
 planner:
@@ -235,7 +262,7 @@ transition_entry, transition_exit, holding, finish
 `departure_tick` 分别是等待开始和结束时间步。等待同时保留在 `traffic_events` 中；
 筛选导航检查点不会删除该审计信息。
 
-## 7. 输出
+## 8. 输出
 
 成功后输出目录包含：
 

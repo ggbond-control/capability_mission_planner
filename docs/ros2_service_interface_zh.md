@@ -1,6 +1,7 @@
 # ROS2 任务规划服务接口
 
-规划节点只通过 ROS2 服务与任务规划桥交互。任务 YAML 文件、地图包和输出目录必须能被规划节点访问。
+规划节点只通过 ROS2 服务与任务规划桥交互。任务 YAML 文件和地图包必须能被规划节点
+访问；规划节点还必须具有 YAML 所在目录的写入权限，以便写出默认结果文件。
 
 ## 构建与启动
 
@@ -34,7 +35,7 @@ ros2 service call /capability_mission_planner/plan \
   "{parameters: [{name: mission_yaml_path, value: {type: 4, string_value: '/data/missions/mission-001.yaml'}}]}"
 ```
 
-节点读取该 YAML 配置并执行规划。配置中的相对路径相对于 YAML 文件所在目录解析；地图包本身使用标准 Nav2 地图 YAML、PNG 和多地图 CSV 文件。配置中的 `output_directory` 为必填字段。
+节点读取该 YAML 配置并执行规划。配置中的相对路径相对于 YAML 文件所在目录解析；地图包本身使用标准 Nav2 地图 YAML、PNG 和多地图 CSV 文件。`output_directory` 可选；未填写时，结果直接写入任务 YAML 所在目录。
 
 ## 响应
 
@@ -45,7 +46,7 @@ successful = true
 reason = /data/mission_results/mission-001/plan.json
 ```
 
-规划器会在 `output_directory` 中生成 `plan.json`、`summary.txt` 和路线 PNG，`reason` 只返回已生成 `plan.json` 的绝对路径，任务规划桥直接读取该文件即可。
+规划器会在 `output_directory` 或任务 YAML 所在目录生成 `plan.json`、`summary.txt` 和路线 PNG，`reason` 只返回已生成 `plan.json` 的绝对路径，任务规划桥直接读取该文件即可。同一路径的既有结果文件会被覆盖。
 
 失败时 `successful = false`，`reason` 为可读的失败原因，例如参数错误、路径不是绝对 `.yaml` 文件、文件不存在、YAML/地图配置错误或无可行规划结果。
 

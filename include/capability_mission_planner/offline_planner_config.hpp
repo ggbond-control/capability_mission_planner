@@ -28,8 +28,7 @@ public:
   static ConfiguredMission load(const std::filesystem::path& config_path);
   static ConfiguredMission load_node(
     const YAML::Node& root,
-    const std::filesystem::path& base_path = {},
-    bool require_output_directory = false);
+    const std::filesystem::path& base_path = {});
 };
 
 } // namespace capability_mission_planner::offline
