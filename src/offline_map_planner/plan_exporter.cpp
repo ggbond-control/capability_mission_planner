@@ -1,4 +1,5 @@
 #include <capability_mission_planner/offline_map_planner.hpp>
+#include "plan_animation.hpp"
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
@@ -202,6 +203,11 @@ namespace capability_mission_planner::offline
                    << ",\n  \"total_load_ticks\": " << plan.total_load_ticks
                    << ",\n  \"total_load_seconds\": "
                    << plan.total_load_ticks * plan.time_step_seconds << ",\n";
+            output << "  \"coordination\": {\"method\": " << json(coordination_method(plan))
+                   << ", \"prioritized_succeeded\": " << (plan.coordination_stats.prioritized_succeeded ? "true" : "false")
+                   << ", \"cbs_started\": " << (plan.coordination_stats.cbs_started ? "true" : "false")
+                   << ", \"cbs_succeeded\": " << (plan.coordination_stats.cbs_succeeded ? "true" : "false")
+                   << ", \"total_wait_ticks\": " << plan.coordination_stats.total_wait_ticks << "},\n";
             output << "  \"maps\": [";
             std::size_t map_index = 0;
             for (const auto &[id, map] : bundle.maps)
@@ -246,6 +252,23 @@ namespace capability_mission_planner::offline
                 }
                 output << "\n      ]";
                 write_annotations(output, bundle, robots, tasks, plan, route.robot_index, options);
+                if (options.animation && route.robot_index < plan.schedules.size())
+                {
+                    output << ",\n      \"timed_schedule\": [";
+                    const auto &schedule = plan.schedules[route.robot_index];
+                    for (std::size_t i = 0; i < schedule.size(); ++i)
+                    {
+                        const auto &state = schedule[i];
+                        if (i != 0U)
+                            output << ',';
+                        output << "\n        {\"tick\": " << state.tick << ", ";
+                        write_position(output, bundle, state.position, CoordinateRepresentation::Grid);
+                        output << ", \"route_frame\": " << state.route_frame
+                               << ", \"transition_id\": " << json(state.transition_id)
+                               << ", \"resource\": " << json(state.resource) << "}";
+                    }
+                    output << "\n      ]";
+                }
                 output << "\n    }";
                 if (route_index + 1U != plan.routes.size())
                     output << ',';
@@ -272,6 +295,9 @@ namespace capability_mission_planner::offline
                    << plan.maximum_load_ticks * plan.time_step_seconds << '\n';
             output << "total_load_seconds="
                    << plan.total_load_ticks * plan.time_step_seconds << "\n\n";
+            output << "coordination_method=" << coordination_method(plan) << '\n'
+                   << "coordination_wait_seconds="
+                   << plan.coordination_stats.total_wait_ticks * plan.time_step_seconds << "\n\n";
             for (const auto &route : plan.routes)
             {
                 output << "robot " << robots[route.robot_index].id << ": travel="
@@ -313,6 +339,7 @@ namespace capability_mission_planner::offline
         const OfflineMissionPlan &plan,
         const ExportOptions &options)
     {
+        validate_animation(robots, plan, options);
         std::filesystem::create_directories(output_directory);
         std::ofstream json_output(output_directory / "plan.json");
         if (!json_output)
@@ -417,5 +444,6 @@ namespace capability_mission_planner::offline
             if (!cv::imwrite(output_path.string(), image))
                 throw std::runtime_error("cannot write " + output_path.string());
         }
+        write_animation(output_directory / "routes_overall.gif", bundle, robots, tasks, plan, options);
     }
 } // namespace capability_mission_planner::offline

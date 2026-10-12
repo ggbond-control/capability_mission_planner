@@ -29,6 +29,7 @@ target_compile_options(capability_mission_planner PRIVATE -Wall -Wextra -Wpedant
 if(BUILD_OFFLINE_MAP_ADAPTER)
   find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc)
   find_package(yaml-cpp REQUIRED)
+  find_package(GIF QUIET)
   add_library(capability_mission_planner_map_adapter
     src/offline_map_planner/map_bundle_loader.cpp
     src/offline_map_planner/multi_map_path_planner.cpp
@@ -36,6 +37,7 @@ if(BUILD_OFFLINE_MAP_ADAPTER)
     src/offline_map_planner/offline_planner_config.cpp
     src/offline_map_planner/multi_map_coordinator.cpp
     src/offline_map_planner/plan_exporter.cpp
+    src/offline_map_planner/plan_animation.cpp
     src/offline_map_planner/live_reservation.cpp)
   target_include_directories(capability_mission_planner_map_adapter
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -45,6 +47,13 @@ if(BUILD_OFFLINE_MAP_ADAPTER)
     PRIVATE yaml-cpp ${OpenCV_LIBS})
   target_compile_options(capability_mission_planner_map_adapter
     PRIVATE -Wall -Wextra -Wpedantic)
+  if(GIF_FOUND)
+    target_include_directories(capability_mission_planner_map_adapter PRIVATE ${GIF_INCLUDE_DIRS})
+    target_link_libraries(capability_mission_planner_map_adapter PRIVATE ${GIF_LIBRARIES})
+    target_compile_definitions(capability_mission_planner_map_adapter PRIVATE CMP_HAVE_GIF)
+  else()
+    message(STATUS "giflib unavailable: PNG/JSON exports work; GIF export requires libgif-dev")
+  endif()
 
   add_executable(offline_map_demo examples/offline_map_demo.cpp)
   target_link_libraries(offline_map_demo PRIVATE capability_mission_planner_map_adapter)
@@ -98,6 +107,12 @@ if(BUILD_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR}/capability_mission_plan.png)
   endif()
   if(TARGET capability_mission_planner_map_adapter)
+    if(GIF_FOUND)
+      add_executable(plan_animation_tests test/plan_animation_tests.cpp)
+      target_include_directories(plan_animation_tests PRIVATE ${GIF_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+      target_link_libraries(plan_animation_tests PRIVATE capability_mission_planner_map_adapter ${GIF_LIBRARIES} ${OpenCV_LIBS} yaml-cpp)
+      add_test(NAME plan_animation_tests COMMAND plan_animation_tests)
+    endif()
     add_executable(live_reservation_tests test/live_reservation_tests.cpp)
     target_link_libraries(live_reservation_tests PRIVATE capability_mission_planner_map_adapter)
     add_test(NAME live_reservation_tests COMMAND live_reservation_tests)
@@ -162,6 +177,12 @@ if(BUILD_TESTING)
         add_test(NAME single_map_bdz1_shared_charger_benchmark COMMAND capability_mission_planner_cli
           ${SCENARIO_ROOT}/configs/bdz1/03_homogeneous_shared_charger_benchmark.yaml
           ${CMAKE_CURRENT_BINARY_DIR}/offline_bdz1_shared_charger_output)
+      endif()
+      if(EXISTS "${SCENARIO_ROOT}/configs/sxbdz1/01_six_robots_80_sites_100_tasks.yaml")
+        add_test(NAME single_map_sxbdz1_complex_mission COMMAND offline_scenario_test
+          ${SCENARIO_ROOT}/configs/sxbdz1/01_six_robots_80_sites_100_tasks.yaml)
+        set_tests_properties(single_map_sxbdz1_complex_mission PROPERTIES
+          LABELS "single_map_scenarios;sxbdz1" TIMEOUT 180)
       endif()
     endif()
   endif()

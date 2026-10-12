@@ -88,6 +88,17 @@ contains:
 - `summary.txt`: compact human-readable route summary;
 - `routes_<map_id>.png`: one original occupancy map per layer with robot paths,
   starts, tasks, and transition points overlaid.
+- `routes_overall.gif` when `export.animation: true`: synchronized replay of
+  all maps and robots from the exact timed schedules, with task service and
+  coordination waits highlighted. Requires giflib (`sudo apt install libgif-dev`
+  before configuring CMake) and `planner.coordinate_conflicts: true`.
+
+For example, add `animation: true`, `animation_fps: 10`,
+`animation_speedup: 20.0`, `animation_max_frames: 600`, and
+`animation_width: 1280` under `export`. Animation is disabled by default.
+When enabled, `plan.json` also includes every robot's `timed_schedule` in grid
+coordinates. The `coordination.method` field and GIF header report `prioritized`,
+`cbs`, or `none`; the offline adapter tries prioritized scheduling before CBS.
 
 Cross-map routing uses A* inside each occupancy grid and Dijkstra over the
 sparse transition topology. Task allocation minimizes weighted maximum robot

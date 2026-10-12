@@ -402,6 +402,12 @@ namespace capability_mission_planner::offline
         bool draw_grid = false;
         bool filter_navigation_checkpoint_types = false;
         std::set<std::string> navigation_checkpoint_types;
+        // Optional, synchronized replay of the exact coordination schedules.
+        bool animation = false;
+        int animation_fps = 10;
+        double animation_speedup = 20.0;
+        int animation_max_frames = 600;
+        int animation_width = 1280;
     };
 
     class PlanExporter

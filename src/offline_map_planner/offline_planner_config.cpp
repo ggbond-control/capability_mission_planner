@@ -278,6 +278,23 @@ namespace capability_mission_planner::offline
                 result.export_options.path_thickness = root["export"]["path_thickness"].as<int>();
             if (root["export"]["draw_grid"])
                 result.export_options.draw_grid = root["export"]["draw_grid"].as<bool>();
+            const auto display = root["export"];
+            if (display["animation"])
+                result.export_options.animation = display["animation"].as<bool>();
+            if (display["animation_fps"])
+                result.export_options.animation_fps = display["animation_fps"].as<int>();
+            if (display["animation_speedup"])
+                result.export_options.animation_speedup = display["animation_speedup"].as<double>();
+            if (display["animation_max_frames"])
+                result.export_options.animation_max_frames = display["animation_max_frames"].as<int>();
+            if (display["animation_width"])
+                result.export_options.animation_width = display["animation_width"].as<int>();
+            const auto &animation = result.export_options;
+            if (animation.animation_fps < 1 || animation.animation_fps > 50 ||
+                !std::isfinite(animation.animation_speedup) || animation.animation_speedup <= 0.0 ||
+                animation.animation_max_frames < 2 ||
+                animation.animation_width < 640 || animation.animation_width > 4096)
+                throw std::runtime_error("invalid export animation options: fps 1..50, speedup > 0, max_frames >= 2, width 640..4096 required");
             if (root["export"]["navigation_checkpoint_types"])
             {
                 const auto types = root["export"]["navigation_checkpoint_types"];

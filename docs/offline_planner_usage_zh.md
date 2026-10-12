@@ -205,7 +205,7 @@ planner:
       elevator: []
 ```
 
-- `coordinate_conflicts`：启用 CBS 时间协调；关闭时仍分配和规划路径，但不消解
+- `coordinate_conflicts`：启用时间协调，先尝试优先级调度，失败后使用 CBS；关闭时仍分配和规划路径，但不消解
   机器人之间的时空冲突。
 - `maximum_load_weight`：最大单机负载权重，越大越倾向负载均衡。
 - `total_load_weight`：所有机器人总负载权重，越大越倾向减少总路程和总时间。
@@ -247,6 +247,11 @@ export:
   path_thickness: 3
   draw_grid: false
   navigation_checkpoint_types: [start, task, turn, holding, finish]
+  animation: true                  # 默认 false，额外输出总体 GIF
+  animation_fps: 10                 # 1..50，目标帧率
+  animation_speedup: 20.0           # 播放倍率，必须大于 0
+  animation_max_frames: 600         # 至少 2，限制文件大小和导出时间
+  animation_width: 1280             # 总画面宽度，640..4096
 ```
 
 `navigation_checkpoint_types` 可选，用于筛选导出的
@@ -262,6 +267,25 @@ transition_entry, transition_exit, holding, finish
 `departure_tick` 分别是等待开始和结束时间步。等待同时保留在 `traffic_events` 中；
 筛选导航检查点不会删除该审计信息。
 
+总体动画直接读取协调后的逐时间步 `schedules`，不连接稀疏检查点来推测轨迹。
+所有机器人共用同一仿真时钟；完成任务的机器人保留在最终停靠位置。多地图同时
+分面显示，跨地图时切换面板。彩色轨迹代表已执行路径；橙色光圈代表协调等待，
+方框代表任务作业，侧栏显示状态、累计等待和最近一次等待。
+任务点标注为输入任务的顺序编号，与静态 PNG 一致；同点多个任务以 `16/81` 形式
+合并标注，避免长任务名遮挡地图。单地图根据原图宽高比自适应显示，面板高度上限
+为 1100 像素，多地图面板高度上限为 600 像素。
+
+采样按 `animation_speedup / (animation_fps * time_step_seconds)` 选择时间步，
+保留起始和最终帧，最后停留 1 秒后循环；超出帧数上限时增大采样间隔和播放倍率。
+帧数预算允许时，额外纳入协调等待的开始时间。短等待可能只出现一帧，侧栏会
+保留最近等待的时间与时长；需要细看时降低倍率。图中圆点用于标识位置，尺寸不代表
+机器人的实体 footprint。GIF 展示最终调度结果，不展示 CBS 搜索树的逐次展开。
+
+GIF 导出依赖 giflib：构建前安装 `sudo apt install libgif-dev`，然后重新运行 CMake。
+没有 giflib 时仍可使用原有 PNG/JSON 导出；请求 GIF 会给出明确错误。
+`animation: true` 必须与 `planner.coordinate_conflicts: true` 配合使用。
+动画开关不改变任务分配、路径或协调算法。
+
 ## 8. 输出
 
 成功后输出目录包含：
@@ -271,15 +295,30 @@ plan.json
 summary.txt
 routes_map_000.png
 routes_map_001.png
+routes_overall.gif  # 启用 export.animation 时
 ...
 ```
 
 - `plan.json`：机器人的任务分配、停靠顺序、负载、栅格/局部/ROOT 坐标，以及
   面向导航执行的 `navigation_checkpoints` 和冲突等待等 `traffic_events`。等待检查点
   的类型为 `holding`。
-  CBS 内部仍按时间片求解，但导出只保留语义化导航关键点。
+  启用动画时，额外包含 `timed_schedule`：每步的 `tick`、`map_id`、`grid`、
+  `route_frame`、`transition_id` 和 `resource`。这些完整轨迹独立于检查点筛选；
+  `coordination` 标明实际方法、CBS 是否启动/成功和协调等待时间步数。
 - `summary.txt`：便于人工快速阅读的路线摘要。
 - `routes_<map_id>.png`：在每张原始栅格图上叠加机器人起点、任务编号、通道和
   规划路径。
+- `routes_overall.gif`：全部地图与机器人的同步执行动画。
+
+要验证真正的 CBS 等待效果，可运行不依赖外部场景地图的回归用例，并保存演示结果：
+
+```bash
+./build/plan_animation_tests output/cbs_wait_demo
+```
+
+该用例让机器人 B 在自己的起点作业 3 秒，机器人 A 的路径经过此处。优先级调度
+失败后，CBS 给 A 插入等待，B 离开后 A 再通过。输出的 `routes_overall.gif` 与
+`plan.json` 来自真实 CBS 求解。普通场景若显示 `method: prioritized` 且等待为 0，
+只能说明该任务分配无需进一步避让；要演示 CBS，应使用确实触发回退的冲突用例。
 
 当前接口只把结果写到本地，不启动 ROS2，也不直接向机器人发送任务。

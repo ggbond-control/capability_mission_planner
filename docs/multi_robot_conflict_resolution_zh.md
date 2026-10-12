@@ -15,8 +15,11 @@
         -> 直到得到无冲突的时间表
 ```
 
-第一阶段只考虑地图障碍物、机器人能力、任务顺序和跨地图通道。第二阶段使用
-Conflict-Based Search（CBS）协调多台机器人。
+第一阶段只考虑地图障碍物、机器人能力、任务顺序和跨地图通道。离线多地图适配器
+在第二阶段先尝试优先级调度，成功时直接采用结果；失败时回退到
+Conflict-Based Search（CBS）。因此开启冲突协调不代表每次都会运行 CBS。
+`plan.json` 的 `coordination.method` 和可选的 `routes_overall.gif` 会标明实际方法；
+动画导出参数见 [离线规划器用法](offline_planner_usage_zh.md)。
 
 例如，两台机器人分别得到以下路径：
 
