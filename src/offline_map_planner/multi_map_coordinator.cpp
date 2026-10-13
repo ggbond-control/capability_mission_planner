@@ -1,4 +1,6 @@
 #include "multi_map_coordinator.hpp"
+#include "route_reservations.hpp"
+#include "safe_interval_scheduler.hpp"
 
 #include <capability_mission_planner/search/conflict_based_search.hpp>
 
@@ -14,12 +16,6 @@ namespace capability_mission_planner::offline
 {
     namespace
     {
-        struct RouteFrame
-        {
-            GridPosition position;
-            std::string resource;
-        };
-
         struct State
         {
             int tick = 0;
@@ -276,9 +272,42 @@ namespace capability_mission_planner::offline
             Environment(std::vector<std::vector<RouteFrame>> frames,
                         const MultiMapBundle &bundle, const std::vector<MappedRobot> &robots,
                         CoordinationStats *stats)
-                : _frames(std::move(frames)), _bundle(bundle), _robots(robots), _stats(stats) {}
+                : _frames(std::move(frames)), _robots(robots), _stats(stats)
+            {
+                for (auto &route : _frames)
+                    for (auto &frame : route)
+                    {
+                        const auto &map = bundle.map(frame.position.map_id);
+                        const auto root = map.local_to_root(map.grid_to_local(frame.position));
+                        frame.root_x = root.x;
+                        frame.root_y = root.y;
+                    }
+            }
 
             void set_cbs_phase(bool value) { _cbs_phase = value; }
+            void set_stats(CoordinationStats *stats) { _stats = stats; }
+            void set_budget(std::function<void()> budget) { _check_budget = std::move(budget); }
+            void check_budget() const { if (_check_budget) _check_budget(); }
+
+            void prepare_reservations(std::size_t agent, const std::vector<Plan> &plans,
+                                      const std::vector<std::size_t> &fixed, int horizon)
+            {
+                std::vector<ReservationTrack> tracks;
+                for (const auto other : fixed)
+                {
+                    check_budget();
+                    ReservationTrack track{other, {}};
+                    track.frames.reserve(plans[other].states.size());
+                    for (const auto &state : plans[other].states)
+                        track.frames.push_back(state.first.frame);
+                    tracks.push_back(std::move(track));
+                }
+                _reservations = std::make_unique<RouteReservations>(_frames, _robots, agent, tracks, horizon, _stats, _check_budget);
+            }
+
+            RouteReservations &reservations() { return *_reservations; }
+            const std::vector<RouteFrame> &frames(std::size_t agent) const { return _frames.at(agent); }
+            CoordinationStats *stats() { return _stats; }
 
             const RouteFrame &route_frame(std::size_t agent, const State &state) const
             {
@@ -360,6 +389,7 @@ namespace capability_mission_planner::offline
                     horizon = std::max(horizon, plan.states.size());
                 for (std::size_t tick = 0; tick < horizon; ++tick)
                 {
+                    if ((tick & 255U) == 0U) check_budget();
                     for (std::size_t a = 0; a < plans.size(); ++a)
                     {
                         for (std::size_t b = a + 1U; b < plans.size(); ++b)
@@ -374,7 +404,7 @@ namespace capability_mission_planner::offline
                                 finish();
                                 return true;
                             }
-                            if (positions_too_close(first_frame.position, second_frame.position, a, b))
+                            if (positions_too_close(first_frame, second_frame, a, b))
                             {
                                 output = Conflict{Conflict::Type::Vertex, static_cast<int>(tick), a, b, first_frame.position, first_frame.position, second_frame.position, second_frame.position, {}};
                                 finish();
@@ -386,10 +416,8 @@ namespace capability_mission_planner::offline
                             const auto &second_next = state_at(plans[b], tick + 1U);
                             const auto &first_next_frame = route_frame(a, first_next);
                             const auto &second_next_frame = route_frame(b, second_next);
-                            if (first_frame.resource.empty() && second_frame.resource.empty() &&
-                                first_next_frame.resource.empty() && second_next_frame.resource.empty() &&
-                                swept_paths_too_close(first_frame.position, first_next_frame.position,
-                                                      second_frame.position, second_next_frame.position, a, b))
+                            if (swept_paths_too_close(first_frame, first_next_frame,
+                                                      second_frame, second_next_frame, a, b))
                             {
                                 output = Conflict{Conflict::Type::Edge, static_cast<int>(tick), a, b, first_frame.position, first_next_frame.position, second_frame.position, second_next_frame.position, {}};
                                 finish();
@@ -454,65 +482,39 @@ namespace capability_mission_planner::offline
                 }
             }
 
-            bool allowedAgainstPlans(std::size_t agent, const State &from, const State &to,
-                                     const std::vector<Plan> &plans, const std::vector<std::size_t> &fixed) const
-            {
-                for (const auto other : fixed)
-                {
-                    const auto &other_to = state_at(plans[other], static_cast<std::size_t>(to.tick));
-                    const auto &to_frame = route_frame(agent, to);
-                    const auto &other_to_frame = route_frame(other, other_to);
-                    if (!to_frame.resource.empty() && to_frame.resource == other_to_frame.resource)
-                        return false;
-                    if (positions_too_close(to_frame.position, other_to_frame.position, agent, other))
-                        return false;
-                    const auto &other_from = state_at(plans[other], static_cast<std::size_t>(from.tick));
-                    const auto &from_frame = route_frame(agent, from);
-                    const auto &other_from_frame = route_frame(other, other_from);
-                    if (from_frame.resource.empty() && to_frame.resource.empty() &&
-                        other_from_frame.resource.empty() && other_to_frame.resource.empty() &&
-                        swept_paths_too_close(from_frame.position, to_frame.position, other_from_frame.position,
-                                              other_to_frame.position, agent, other))
-                        return false;
-                }
-                return true;
-            }
-
         private:
-            MetricPose root_pose(const GridPosition &position) const
-            {
-                const auto local = _bundle.map(position.map_id).grid_to_local(position);
-                return _bundle.map(position.map_id).local_to_root(local);
-            }
-
             double safety_distance(std::size_t first, std::size_t second) const
             {
                 return _robots[first].footprint_radius_m + _robots[second].footprint_radius_m +
-                       _robots[first].safety_margin_m + _robots[second].safety_margin_m;
+                       _robots[first].safety_margin_m + _robots[second].safety_margin_m + 1e-9;
             }
 
-            bool positions_too_close(const GridPosition &first, const GridPosition &second,
+            bool positions_too_close(const RouteFrame &first, const RouteFrame &second,
                                      std::size_t a, std::size_t b) const
             {
-                if (first.map_id != second.map_id)
+                if (first.position.map_id != second.position.map_id)
                     return false;
-                const auto p = root_pose(first);
-                const auto q = root_pose(second);
-                return std::hypot(p.x - q.x, p.y - q.y) <= safety_distance(a, b) + 1e-9;
+                const double dx = first.root_x - second.root_x;
+                const double dy = first.root_y - second.root_y;
+                const double radius = safety_distance(a, b);
+                return dx * dx + dy * dy <= radius * radius;
             }
 
-            bool swept_paths_too_close(const GridPosition &af, const GridPosition &at,
-                                       const GridPosition &bf, const GridPosition &bt, std::size_t a, std::size_t b) const
+            bool swept_paths_too_close(const RouteFrame &af, const RouteFrame &at,
+                                       const RouteFrame &bf, const RouteFrame &bt,
+                                       std::size_t a, std::size_t b) const
             {
-                if (af.map_id != at.map_id || bf.map_id != bt.map_id || af.map_id != bf.map_id)
+                if (af.position.map_id != at.position.map_id ||
+                    bf.position.map_id != bt.position.map_id || af.position.map_id != bf.position.map_id)
                     return false;
-                const auto p = root_pose(af), q = root_pose(at), r = root_pose(bf), s = root_pose(bt);
-                const double dx = p.x - r.x, dy = p.y - r.y;
-                const double vx = (q.x - p.x) - (s.x - r.x);
-                const double vy = (q.y - p.y) - (s.y - r.y);
+                const double dx = af.root_x - bf.root_x, dy = af.root_y - bf.root_y;
+                const double vx = (at.root_x - af.root_x) - (bt.root_x - bf.root_x);
+                const double vy = (at.root_y - af.root_y) - (bt.root_y - bf.root_y);
                 const double vv = vx * vx + vy * vy;
                 const double t = vv > 1e-12 ? std::clamp(-(dx * vx + dy * vy) / vv, 0.0, 1.0) : 0.0;
-                return std::hypot(dx + t * vx, dy + t * vy) <= safety_distance(a, b) + 1e-9;
+                const double x = dx + t * vx, y = dy + t * vy;
+                const double radius = safety_distance(a, b);
+                return x * x + y * y <= radius * radius;
             }
 
             bool allowed(const State &from, const State &to) const
@@ -524,87 +526,165 @@ namespace capability_mission_planner::offline
                 if (!to_frame.resource.empty() &&
                     _constraints->resource.count({to.tick, to_frame.resource}) != 0U)
                     return false;
-                if (from_frame.resource.empty() && to_frame.resource.empty() &&
-                    _constraints->edge.count({from.tick, from_frame.position, to_frame.position}) != 0U)
+                if (_constraints->edge.count({from.tick, from_frame.position, to_frame.position}) != 0U)
                     return false;
                 return true;
             }
 
             std::vector<std::vector<RouteFrame>> _frames;
-            const MultiMapBundle &_bundle;
             const std::vector<MappedRobot> &_robots;
             CoordinationStats *_stats = nullptr;
+            std::function<void()> _check_budget;
+            std::unique_ptr<RouteReservations> _reservations;
             bool _cbs_phase = false;
             std::size_t _agent = 0;
             const Constraints *_constraints = nullptr;
             int _last_goal_constraint = -1;
         };
 
-        class PrioritizedEnvironment
-        {
-        public:
-            PrioritizedEnvironment(Environment &environment, std::size_t agent,
-                                   const std::vector<Plan> &plans, const std::vector<std::size_t> &fixed,
-                                   int maximum_tick, double heuristic_weight)
-                : _environment(environment), _agent(agent), _plans(plans), _fixed(fixed),
-                  _maximum_tick(maximum_tick), _heuristic_weight(heuristic_weight)
-            {
-                _environment.setLowLevelContext(agent, &_constraints);
-            }
-            int admissibleHeuristic(const State &state) const
-            {
-                return static_cast<int>(std::ceil(
-                    _environment.admissibleHeuristic(state) * _heuristic_weight));
-            }
-            bool isSolution(const State &state) const { return _environment.isSolution(state); }
-            void getNeighbors(const State &state,
-                              std::vector<search::Neighbor<State, Action, int>> &neighbors) const
-            {
-                if (state.tick >= _maximum_tick)
-                {
-                    neighbors.clear();
-                    return;
-                }
-                _environment.getNeighbors(state, neighbors);
-                neighbors.erase(std::remove_if(neighbors.begin(), neighbors.end(), [&](const auto &next)
-                                               { return !_environment.allowedAgainstPlans(
-                                                     _agent, state, next.state, _plans, _fixed); }),
-                                neighbors.end());
-            }
-            void onExpandNode(const State &state, int f_score, int g_score) const
-            {
-                _environment.onExpandLowLevelNode(state, f_score, g_score);
-            }
-            void onDiscover(const State &, int, int) const {}
-
-        private:
-            Environment &_environment;
-            std::size_t _agent;
-            const std::vector<Plan> &_plans;
-            const std::vector<std::size_t> &_fixed;
-            int _maximum_tick;
-            double _heuristic_weight;
-            Constraints _constraints;
-        };
-
         bool prioritized_schedule(Environment &environment, const std::vector<State> &starts,
                                   int maximum_tick, std::vector<Plan> &plans)
         {
-            constexpr double heuristic_weight = 2.0;
             plans.assign(starts.size(), {});
             std::vector<std::size_t> fixed;
             for (std::size_t agent = 0; agent < starts.size(); ++agent)
             {
-                PrioritizedEnvironment low_level_environment(
-                    environment, agent, plans, fixed, maximum_tick, heuristic_weight);
-                search::AStar<State, Action, int, PrioritizedEnvironment, StateHash> low_level(
-                    low_level_environment);
-                if (!low_level.search(starts[agent], plans[agent]))
+                environment.prepare_reservations(agent, plans, fixed, maximum_tick);
+                Constraints constraints;
+                environment.setLowLevelContext(agent, &constraints);
+                std::vector<std::size_t> route_frames;
+                if (!schedule_safe_intervals(environment.reservations(), environment.frames(agent), agent,
+                                             route_frames, environment.stats()))
                     return false;
+                auto &plan = plans[agent];
+                for (std::size_t tick = 0; tick < route_frames.size(); ++tick)
+                    plan.states.push_back({{static_cast<int>(tick), route_frames[tick]}, static_cast<int>(tick)});
+                plan.cost = static_cast<int>(route_frames.size() - 1U);
+                plan.fmin = plan.cost;
                 fixed.push_back(agent);
             }
             Conflict conflict;
             return !environment.getFirstConflict(plans, conflict);
+        }
+
+        struct RepairBudgetReached {};
+
+        // One transaction: change at most three schedules, keep all others frozen.
+        // Failed, slower, or over-budget trials never replace the baseline.
+        void repair_critical_schedule(Environment &environment, const TraversalOptions &options,
+                                      int horizon, std::vector<Plan> &plans, CoordinationStats &stats)
+        {
+            if (!options.coordination_local_repair || plans.size() < 2)
+                return;
+            const auto critical = static_cast<std::size_t>(std::distance(plans.begin(),
+                std::max_element(plans.begin(), plans.end(), [](const auto &a, const auto &b)
+                                 { return a.cost < b.cost; })));
+            const auto mandatory = environment.frames(critical).size() - 1U;
+            const auto wait = static_cast<std::size_t>(plans[critical].cost) - mandatory;
+            if (wait < std::max<std::size_t>(2, mandatory / 20U))
+                return;
+            std::vector<std::size_t> blockers;
+            const auto &counts = stats.blocking_departure_ticks_by_robot.at(critical);
+            for (std::size_t r = 0; r < plans.size(); ++r)
+                if (r != critical && counts[r]) blockers.push_back(r);
+            std::stable_sort(blockers.begin(), blockers.end(), [&](auto a, auto b)
+                             { return counts[a] > counts[b]; });
+            if (blockers.empty()) return;
+            blockers.resize(std::min<std::size_t>(2, blockers.size()));
+            std::sort(blockers.begin(), blockers.end());
+            stats.local_repair_robots = {critical};
+            stats.local_repair_robots.insert(stats.local_repair_robots.end(), blockers.begin(), blockers.end());
+            stats.local_repair_attempted = true;
+            stats.local_repair_makespan_before_ticks = plans[critical].cost;
+            stats.local_repair_makespan_after_ticks = plans[critical].cost;
+            const auto started = std::chrono::steady_clock::now();
+            const auto check = [&]()
+            {
+                if (std::chrono::duration<double>(std::chrono::steady_clock::now() - started).count() >=
+                    options.coordination_repair_budget_seconds)
+                    throw RepairBudgetReached{};
+            };
+            CoordinationStats trial_stats;
+            environment.set_stats(&trial_stats);
+            environment.set_budget(check);
+            try
+            {
+                std::vector<Plan> candidate;
+                long long original_total = 0;
+                for (const auto &plan : plans)
+                {
+                    check();
+                    original_total += plan.cost;
+                    candidate.push_back(plan);
+                }
+                std::vector<std::size_t> fixed;
+                for (std::size_t r = 0; r < plans.size(); ++r)
+                    if (std::find(stats.local_repair_robots.begin(), stats.local_repair_robots.end(), r) ==
+                        stats.local_repair_robots.end()) fixed.push_back(r);
+                bool complete = true;
+                for (const auto agent : stats.local_repair_robots)
+                {
+                    check();
+                    if (trial_stats.safe_interval_expanded_nodes >= options.coordination_repair_max_expanded_nodes)
+                        throw RepairBudgetReached{};
+                    environment.prepare_reservations(agent, candidate, fixed, horizon);
+                    Constraints constraints;
+                    environment.setLowLevelContext(agent, &constraints);
+                    std::vector<std::size_t> frames;
+                    if (!schedule_safe_intervals(environment.reservations(), environment.frames(agent), agent,
+                                                 frames, &trial_stats,
+                                                 options.coordination_repair_max_expanded_nodes -
+                                                 trial_stats.safe_interval_expanded_nodes))
+                    {
+                        stats.local_repair_budget_exhausted =
+                            trial_stats.safe_interval_expanded_nodes >= options.coordination_repair_max_expanded_nodes;
+                        complete = false;
+                        break;
+                    }
+                    Plan plan;
+                    for (std::size_t tick = 0; tick < frames.size(); ++tick)
+                    {
+                        if ((tick & 255U) == 0U) check();
+                        plan.states.push_back({{static_cast<int>(tick), frames[tick]}, static_cast<int>(tick)});
+                    }
+                    plan.cost = plan.fmin = static_cast<int>(frames.size() - 1U);
+                    candidate[agent] = std::move(plan);
+                    fixed.push_back(agent);
+                }
+                if (complete)
+                {
+                    int makespan = 0;
+                    long long total = 0;
+                    for (const auto &plan : candidate)
+                    {
+                        makespan = std::max(makespan, plan.cost);
+                        total += plan.cost;
+                    }
+                    Conflict conflict;
+                    if (makespan < stats.local_repair_makespan_before_ticks && total <= original_total &&
+                        !environment.getFirstConflict(candidate, conflict))
+                    {
+                        check();
+                        plans.swap(candidate);
+                        stats.local_repair_accepted = true;
+                        stats.local_repair_makespan_after_ticks = makespan;
+                    }
+                }
+            }
+            catch (const RepairBudgetReached &)
+            {
+                stats.local_repair_budget_exhausted = true;
+            }
+            catch (...)
+            {
+                environment.set_budget({});
+                environment.set_stats(&stats);
+                throw;
+            }
+            environment.set_budget({});
+            environment.set_stats(&stats);
+            stats.local_repair_expanded_nodes = trial_stats.safe_interval_expanded_nodes;
+            stats.local_repair_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - started).count();
         }
     } // namespace
 
@@ -628,15 +708,21 @@ namespace capability_mission_planner::offline
             starts.push_back(State{0, 0U});
         }
 
-        if (stats)
-            *stats = {};
+        CoordinationStats internal_stats;
+        if (!stats) stats = &internal_stats;
+        *stats = {};
         Environment environment(std::move(frames), path_planner.bundle(), robots, stats);
+        std::vector<Plan> initial_plans(robots.size());
+        for (auto &plan : initial_plans) plan.states.push_back({{0, 0}, 0});
+        Conflict initial_conflict;
+        if (environment.getFirstConflict(initial_plans, initial_conflict))
+            throw std::runtime_error("robot starting positions or resources already conflict at tick zero");
         std::vector<Plan> plans;
         if (stats)
             stats->prioritized_attempted = true;
         const bool prioritized_succeeded = prioritized_schedule(environment, starts,
                                                                 static_cast<int>(std::min(maximum_tick,
-                                                                                          static_cast<std::size_t>(std::numeric_limits<int>::max()))),
+                                                                                          static_cast<std::size_t>(std::numeric_limits<int>::max() - 1))),
                                                                 plans);
         if (stats)
             stats->prioritized_succeeded = prioritized_succeeded;
@@ -656,6 +742,10 @@ namespace capability_mission_planner::offline
             if (stats)
                 stats->cbs_succeeded = true;
         }
+        else
+            repair_critical_schedule(environment, path_planner.options(),
+                                     static_cast<int>(std::min(maximum_tick,
+                                         static_cast<std::size_t>(std::numeric_limits<int>::max() - 1))), plans, *stats);
 
         std::vector<std::vector<TimedMapState>> output(plans.size());
         for (std::size_t i = 0; i < plans.size(); ++i)

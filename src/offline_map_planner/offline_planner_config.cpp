@@ -153,6 +153,12 @@ namespace capability_mission_planner::offline
             if (node["coordination_max_high_level_nodes"])
                 options.coordination_max_high_level_nodes =
                     node["coordination_max_high_level_nodes"].as<std::size_t>();
+            if (node["coordination_local_repair"])
+                options.coordination_local_repair = node["coordination_local_repair"].as<bool>();
+            if (node["coordination_repair_budget_seconds"])
+                options.coordination_repair_budget_seconds = node["coordination_repair_budget_seconds"].as<double>();
+            if (node["coordination_repair_max_expanded_nodes"])
+                options.coordination_repair_max_expanded_nodes = node["coordination_repair_max_expanded_nodes"].as<std::size_t>();
             if (node["transition_seconds"])
             {
                 require_map(node["transition_seconds"], "planner.traversal.transition_seconds");
@@ -173,7 +179,10 @@ namespace capability_mission_planner::offline
             if (!(options.time_step_seconds > 0.0) || !(options.nominal_speed_mps > 0.0) ||
                 options.default_transition_seconds < 0.0 || options.map_switch_seconds < 0.0 ||
                 options.obstacle_cost_weight < 0.0 || options.coarse_search_factor == 0U ||
-                options.resource_buffer_seconds < 0.0)
+                options.resource_buffer_seconds < 0.0 ||
+                !std::isfinite(options.coordination_repair_budget_seconds) ||
+                options.coordination_repair_budget_seconds <= 0.0 ||
+                options.coordination_repair_max_expanded_nodes == 0U)
             {
                 throw std::runtime_error("planner traversal times and speed are invalid");
             }

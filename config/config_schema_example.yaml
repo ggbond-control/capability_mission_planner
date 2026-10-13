@@ -23,6 +23,9 @@ planner:
     downsample_costmap: false
     coarse_search_factor: 1
     resource_buffer_seconds: 0.5
+    coordination_local_repair: true
+    coordination_repair_budget_seconds: 0.2
+    coordination_repair_max_expanded_nodes: 20000
 
 robots:
   - id: robot_a

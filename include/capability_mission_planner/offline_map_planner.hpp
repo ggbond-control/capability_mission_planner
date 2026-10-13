@@ -136,6 +136,9 @@ namespace capability_mission_planner::offline
         std::map<std::string, CapabilitySet> transition_requirements{{"stairs", {"stairs"}}};
         double resource_buffer_seconds = 0.0;
         std::size_t coordination_max_high_level_nodes = 128U;
+        bool coordination_local_repair = true;
+        double coordination_repair_budget_seconds = 0.2;
+        std::size_t coordination_repair_max_expanded_nodes = 20000U;
         std::vector<SharedResource> shared_resources;
     };
 
@@ -185,6 +188,20 @@ namespace capability_mission_planner::offline
         std::size_t conflict_checks = 0;
         double conflict_check_seconds = 0.0;
         std::size_t total_wait_ticks = 0;
+        std::size_t reservation_intervals = 0;
+        std::size_t reservation_queries = 0;
+        std::size_t safe_interval_expanded_nodes = 0;
+        bool local_repair_attempted = false;
+        bool local_repair_accepted = false;
+        bool local_repair_budget_exhausted = false;
+        double local_repair_seconds = 0.0;
+        std::size_t local_repair_expanded_nodes = 0;
+        int local_repair_makespan_before_ticks = 0;
+        int local_repair_makespan_after_ticks = 0;
+        std::vector<std::size_t> local_repair_robots;
+        // Rejected candidate departures, grouped by affected robot / blocker.
+        // These are search diagnostics, not executed wait durations.
+        std::vector<std::vector<std::size_t>> blocking_departure_ticks_by_robot;
         std::vector<std::size_t> prioritized_expanded_nodes_by_robot;
         std::vector<std::size_t> prioritized_searches_by_robot;
         std::vector<std::size_t> route_frames_by_robot;

@@ -1,0 +1,1546 @@
+{
+  "measured_date": "2026-10-13",
+  "planner_baseline_commit": "c35a9f4de64d3fef61dc8fb0052939ff8efcff6f",
+  "scenarios_commit": "5f098475b4672beabfabe10dee775309378a0028",
+  "build": "Release",
+  "cpu": "Intel Core i9-12900H",
+  "stage_measurements": [
+    {
+      "scenario": "bdz1/03_homogeneous_shared_charger_benchmark",
+      "baseline": {
+        "seconds": 0.00746929,
+        "rss_mb": 74.6836,
+        "makespan": 470.8,
+        "total_finish": 906.8,
+        "wait": 0,
+        "expanded": 9071,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.0053231,
+        "rss_mb": 74.6172,
+        "makespan": 470.8,
+        "total_finish": 906.8,
+        "wait": 0,
+        "expanded": 9071,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.0078626,
+        "rss_mb": 75.2695,
+        "makespan": 470.8,
+        "total_finish": 906.8,
+        "wait": 0,
+        "expanded": 9071,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.00447608,
+        "rss_mb": 75.4883,
+        "makespan": 470.8,
+        "total_finish": 906.8,
+        "wait": 0,
+        "expanded": 1873,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.00484608,
+        "rss_mb": 75.1836,
+        "makespan": 470.8,
+        "total_finish": 906.8,
+        "wait": 0,
+        "expanded": 1873,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "bdz1/04_five_robot_types_50_points",
+      "baseline": {
+        "seconds": 0.0496781,
+        "rss_mb": 77.582,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 41982,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.0280413,
+        "rss_mb": 77.3906,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 41982,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.0738778,
+        "rss_mb": 77.4844,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 41982,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.052542,
+        "rss_mb": 77.3672,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 10278,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.0509756,
+        "rss_mb": 77.0859,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 10278,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "myj1/myj1",
+      "baseline": {
+        "seconds": 0.00477673,
+        "rss_mb": 91.9141,
+        "makespan": 442.4,
+        "total_finish": 496.7,
+        "wait": 0,
+        "expanded": 4970,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.00336416,
+        "rss_mb": 86.1992,
+        "makespan": 442.4,
+        "total_finish": 496.7,
+        "wait": 0,
+        "expanded": 4970,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.00422783,
+        "rss_mb": 86.0117,
+        "makespan": 442.4,
+        "total_finish": 496.7,
+        "wait": 0,
+        "expanded": 4970,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.0025305,
+        "rss_mb": 85.8203,
+        "makespan": 442.4,
+        "total_finish": 496.7,
+        "wait": 0,
+        "expanded": 3234,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.00247505,
+        "rss_mb": 85.9648,
+        "makespan": 442.4,
+        "total_finish": 496.7,
+        "wait": 0,
+        "expanded": 3234,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "sxbdz1/01_six_robots_80_sites_100_tasks",
+      "baseline": {
+        "seconds": 16.0826,
+        "rss_mb": 595.262,
+        "makespan": 1867.6,
+        "total_finish": 7328.2,
+        "wait": 1505.8,
+        "expanded": 7921846,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 10.4804,
+        "rss_mb": 595.355,
+        "makespan": 1867.6,
+        "total_finish": 7328.2,
+        "wait": 1505.8,
+        "expanded": 7921846,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 9.7528,
+        "rss_mb": 607.465,
+        "makespan": 1867.6,
+        "total_finish": 7328.2,
+        "wait": 1505.8,
+        "expanded": 7921846,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.0965835,
+        "rss_mb": 78.3125,
+        "makespan": 1867.6,
+        "total_finish": 7328.2,
+        "wait": 1505.8,
+        "expanded": 13733,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.175008,
+        "rss_mb": 79.1836,
+        "makespan": 1363.8,
+        "total_finish": 6475,
+        "wait": 652.6,
+        "expanded": 13733,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "zju2/01_single_generalist",
+      "baseline": {
+        "seconds": 0.00110494,
+        "rss_mb": 46.4023,
+        "makespan": 164.2,
+        "total_finish": 164.2,
+        "wait": 0,
+        "expanded": 1643,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.00111978,
+        "rss_mb": 47.5391,
+        "makespan": 164.2,
+        "total_finish": 164.2,
+        "wait": 0,
+        "expanded": 1643,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.00149786,
+        "rss_mb": 46.7422,
+        "makespan": 164.2,
+        "total_finish": 164.2,
+        "wait": 0,
+        "expanded": 1643,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.000927738,
+        "rss_mb": 47.5742,
+        "makespan": 164.2,
+        "total_finish": 164.2,
+        "wait": 0,
+        "expanded": 1435,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.000884761,
+        "rss_mb": 47.3516,
+        "makespan": 164.2,
+        "total_finish": 164.2,
+        "wait": 0,
+        "expanded": 1435,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "zju2/02_four_specialists",
+      "baseline": {
+        "seconds": 0.00470362,
+        "rss_mb": 47.1797,
+        "makespan": 96.4,
+        "total_finish": 250.1,
+        "wait": 0,
+        "expanded": 2505,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.00184377,
+        "rss_mb": 47.5234,
+        "makespan": 96.4,
+        "total_finish": 250.1,
+        "wait": 0,
+        "expanded": 2505,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.00335871,
+        "rss_mb": 47.3906,
+        "makespan": 96.4,
+        "total_finish": 250.1,
+        "wait": 0,
+        "expanded": 2505,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.0022869,
+        "rss_mb": 47.6602,
+        "makespan": 96.4,
+        "total_finish": 250.1,
+        "wait": 0,
+        "expanded": 2027,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.00281024,
+        "rss_mb": 47.082,
+        "makespan": 96.4,
+        "total_finish": 250.1,
+        "wait": 0,
+        "expanded": 2027,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "zju2/03_overlapping_capabilities",
+      "baseline": {
+        "seconds": 0.00294189,
+        "rss_mb": 47.3203,
+        "makespan": 92.2,
+        "total_finish": 213.2,
+        "wait": 0,
+        "expanded": 2135,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.00153555,
+        "rss_mb": 47.0352,
+        "makespan": 92.2,
+        "total_finish": 213.2,
+        "wait": 0,
+        "expanded": 2135,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.00218655,
+        "rss_mb": 47.2422,
+        "makespan": 92.2,
+        "total_finish": 213.2,
+        "wait": 0,
+        "expanded": 2135,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.0014638,
+        "rss_mb": 47.1328,
+        "makespan": 92.2,
+        "total_finish": 213.2,
+        "wait": 0,
+        "expanded": 1724,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.00159469,
+        "rss_mb": 47.0664,
+        "makespan": 92.2,
+        "total_finish": 213.2,
+        "wait": 0,
+        "expanded": 1724,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "zju2/04_more_robots_than_tasks",
+      "baseline": {
+        "seconds": 0.00234892,
+        "rss_mb": 47.2695,
+        "makespan": 31.2,
+        "total_finish": 72,
+        "wait": 0,
+        "expanded": 726,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.000595646,
+        "rss_mb": 47.0938,
+        "makespan": 31.2,
+        "total_finish": 72,
+        "wait": 0,
+        "expanded": 726,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.00112556,
+        "rss_mb": 46.9062,
+        "makespan": 31.2,
+        "total_finish": 72,
+        "wait": 0,
+        "expanded": 726,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.00080248,
+        "rss_mb": 47.5273,
+        "makespan": 31.2,
+        "total_finish": 72,
+        "wait": 0,
+        "expanded": 576,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.000786359,
+        "rss_mb": 47.1875,
+        "makespan": 31.2,
+        "total_finish": 72,
+        "wait": 0,
+        "expanded": 576,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "zju2/05_many_tasks_few_robots",
+      "baseline": {
+        "seconds": 0.00246054,
+        "rss_mb": 47.0586,
+        "makespan": 123.8,
+        "total_finish": 241.5,
+        "wait": 0,
+        "expanded": 2417,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.00173436,
+        "rss_mb": 47.5156,
+        "makespan": 123.8,
+        "total_finish": 241.5,
+        "wait": 0,
+        "expanded": 2417,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.00263584,
+        "rss_mb": 47.3164,
+        "makespan": 123.8,
+        "total_finish": 241.5,
+        "wait": 0,
+        "expanded": 2417,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.00160194,
+        "rss_mb": 47.3945,
+        "makespan": 123.8,
+        "total_finish": 241.5,
+        "wait": 0,
+        "expanded": 2136,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.0015939,
+        "rss_mb": 47.5312,
+        "makespan": 123.8,
+        "total_finish": 241.5,
+        "wait": 0,
+        "expanded": 2136,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    },
+    {
+      "scenario": "zju2/06_shared_sites",
+      "baseline": {
+        "seconds": 0.0049451,
+        "rss_mb": 47.6211,
+        "makespan": 97.6,
+        "total_finish": 188.8,
+        "wait": 0,
+        "expanded": 1892,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "safety": {
+        "seconds": 0.00147059,
+        "rss_mb": 47.2539,
+        "makespan": 97.6,
+        "total_finish": 188.8,
+        "wait": 0,
+        "expanded": 1892,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "reservations": {
+        "seconds": 0.00242779,
+        "rss_mb": 46.6328,
+        "makespan": 97.6,
+        "total_finish": 188.8,
+        "wait": 0,
+        "expanded": 1892,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "sipp": {
+        "seconds": 0.00179922,
+        "rss_mb": 47.6094,
+        "makespan": 97.6,
+        "total_finish": 188.8,
+        "wait": 0,
+        "expanded": 1508,
+        "cbs": 0,
+        "unsafe": 0
+      },
+      "repair": {
+        "seconds": 0.00180677,
+        "rss_mb": 47.4023,
+        "makespan": 97.6,
+        "total_finish": 188.8,
+        "wait": 0,
+        "expanded": 1508,
+        "cbs": 0,
+        "unsafe": 0
+      }
+    }
+  ],
+  "repeated_order_comparisons": [
+    {
+      "scenario": "zju2/01_single_generalist",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.000885172,
+        "rss_mb": 47.4141,
+        "makespan": 164.2,
+        "total_finish": 164.2,
+        "wait": 0,
+        "expanded": 1435,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.000885871,
+        "rss_mb": 47.5117,
+        "makespan": 164.2,
+        "total_finish": 164.2,
+        "wait": 0,
+        "expanded": 1435,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "zju2/02_four_specialists",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.00229907,
+        "rss_mb": 47.4414,
+        "makespan": 96.4,
+        "total_finish": 250.1,
+        "wait": 0,
+        "expanded": 2027,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.00216208,
+        "rss_mb": 47.2383,
+        "makespan": 96.4,
+        "total_finish": 250.1,
+        "wait": 0,
+        "expanded": 2027,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "zju2/03_overlapping_capabilities",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.00152089,
+        "rss_mb": 47.4727,
+        "makespan": 92.2,
+        "total_finish": 213.2,
+        "wait": 0,
+        "expanded": 1724,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.0014597,
+        "rss_mb": 47.25,
+        "makespan": 92.2,
+        "total_finish": 213.2,
+        "wait": 0,
+        "expanded": 1724,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "zju2/04_more_robots_than_tasks",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.000762109,
+        "rss_mb": 47.2695,
+        "makespan": 31.2,
+        "total_finish": 72,
+        "wait": 0,
+        "expanded": 576,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.000763599,
+        "rss_mb": 47.1797,
+        "makespan": 31.2,
+        "total_finish": 72,
+        "wait": 0,
+        "expanded": 576,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "zju2/05_many_tasks_few_robots",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.00172709,
+        "rss_mb": 47.3633,
+        "makespan": 123.8,
+        "total_finish": 241.5,
+        "wait": 0,
+        "expanded": 2136,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.00165577,
+        "rss_mb": 47.0898,
+        "makespan": 123.8,
+        "total_finish": 241.5,
+        "wait": 0,
+        "expanded": 2136,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "zju2/06_shared_sites",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.00177141,
+        "rss_mb": 47.3789,
+        "makespan": 97.6,
+        "total_finish": 188.8,
+        "wait": 0,
+        "expanded": 1508,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.00178178,
+        "rss_mb": 47.1719,
+        "makespan": 97.6,
+        "total_finish": 188.8,
+        "wait": 0,
+        "expanded": 1508,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "myj1/myj1",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.00258595,
+        "rss_mb": 86.4414,
+        "makespan": 442.4,
+        "total_finish": 496.7,
+        "wait": 0,
+        "expanded": 3234,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.00250127,
+        "rss_mb": 86.0352,
+        "makespan": 442.4,
+        "total_finish": 496.7,
+        "wait": 0,
+        "expanded": 3234,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "bdz1/03_homogeneous_shared_charger_benchmark",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.00475312,
+        "rss_mb": 75.3711,
+        "makespan": 470.8,
+        "total_finish": 906.8,
+        "wait": 0,
+        "expanded": 1873,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.00445901,
+        "rss_mb": 75.207,
+        "makespan": 470.8,
+        "total_finish": 906.8,
+        "wait": 0,
+        "expanded": 1873,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "bdz1/04_five_robot_types_50_points",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.0511903,
+        "rss_mb": 77.4219,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 10278,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.0509995,
+        "rss_mb": 77.3711,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 10278,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "sxbdz1/01_six_robots_80_sites_100_tasks",
+      "rotation": 0,
+      "sipp": {
+        "seconds": 0.101836,
+        "rss_mb": 77.7852,
+        "makespan": 1867.6,
+        "total_finish": 7328.2,
+        "wait": 1505.8,
+        "expanded": 13733,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.189876,
+        "rss_mb": 78.4727,
+        "makespan": 1363.8,
+        "total_finish": 6475,
+        "wait": 652.6,
+        "expanded": 13733,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 1,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0795912,
+        "repair_expanded": 7016,
+        "repair_robots": [
+          5,
+          1,
+          3
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "sxbdz1/01_six_robots_80_sites_100_tasks",
+      "rotation": 1,
+      "sipp": {
+        "seconds": 0.111642,
+        "rss_mb": 77.7734,
+        "makespan": 1337.6,
+        "total_finish": 6579.6,
+        "wait": 757.2,
+        "expanded": 12610,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.199914,
+        "rss_mb": 78.457,
+        "makespan": 1337.6,
+        "total_finish": 6579.6,
+        "wait": 757.2,
+        "expanded": 12610,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0809421,
+        "repair_expanded": 7341,
+        "repair_robots": [
+          4,
+          1,
+          2
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "sxbdz1/01_six_robots_80_sites_100_tasks",
+      "rotation": 2,
+      "sipp": {
+        "seconds": 0.121115,
+        "rss_mb": 77.5859,
+        "makespan": 1843.2,
+        "total_finish": 7482.4,
+        "wait": 1660,
+        "expanded": 13459,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.204181,
+        "rss_mb": 78.7969,
+        "makespan": 1843.2,
+        "total_finish": 7482.4,
+        "wait": 1660,
+        "expanded": 13459,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0867494,
+        "repair_expanded": 7906,
+        "repair_robots": [
+          3,
+          0,
+          1
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "sxbdz1/01_six_robots_80_sites_100_tasks",
+      "rotation": 3,
+      "sipp": {
+        "seconds": 0.120651,
+        "rss_mb": 75.7461,
+        "makespan": 1344.2,
+        "total_finish": 6369.4,
+        "wait": 547,
+        "expanded": 11925,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.20572,
+        "rss_mb": 75.8828,
+        "makespan": 1344.2,
+        "total_finish": 6369.4,
+        "wait": 547,
+        "expanded": 11925,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0808983,
+        "repair_expanded": 6123,
+        "repair_robots": [
+          2,
+          0,
+          1
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "sxbdz1/01_six_robots_80_sites_100_tasks",
+      "rotation": 4,
+      "sipp": {
+        "seconds": 0.125366,
+        "rss_mb": 76.6016,
+        "makespan": 1370.6,
+        "total_finish": 6397.6,
+        "wait": 575.2,
+        "expanded": 12764,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.217417,
+        "rss_mb": 77.2539,
+        "makespan": 1370.6,
+        "total_finish": 6397.6,
+        "wait": 575.2,
+        "expanded": 12764,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0967594,
+        "repair_expanded": 7732,
+        "repair_robots": [
+          5,
+          2,
+          3
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "sxbdz1/01_six_robots_80_sites_100_tasks",
+      "rotation": 5,
+      "sipp": {
+        "seconds": 0.123475,
+        "rss_mb": 76.3555,
+        "makespan": 1368,
+        "total_finish": 6481.8,
+        "wait": 659.4,
+        "expanded": 12447,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.221753,
+        "rss_mb": 78.1992,
+        "makespan": 1368,
+        "total_finish": 6481.8,
+        "wait": 659.4,
+        "expanded": 12447,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.097982,
+        "repair_expanded": 7615,
+        "repair_robots": [
+          4,
+          1,
+          2
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "bdz1/04_five_robot_types_50_points",
+      "rotation": 1,
+      "sipp": {
+        "seconds": 0.0667833,
+        "rss_mb": 77.8125,
+        "makespan": 1004.7,
+        "total_finish": 4189.3,
+        "wait": 0.1,
+        "expanded": 10277,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.0590196,
+        "rss_mb": 77.668,
+        "makespan": 1004.7,
+        "total_finish": 4189.3,
+        "wait": 0.1,
+        "expanded": 10277,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "bdz1/04_five_robot_types_50_points",
+      "rotation": 2,
+      "sipp": {
+        "seconds": 0.0657112,
+        "rss_mb": 78.1484,
+        "makespan": 1004.7,
+        "total_finish": 4189.3,
+        "wait": 0.1,
+        "expanded": 10277,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.0608125,
+        "rss_mb": 78.0469,
+        "makespan": 1004.7,
+        "total_finish": 4189.3,
+        "wait": 0.1,
+        "expanded": 10277,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "bdz1/04_five_robot_types_50_points",
+      "rotation": 3,
+      "sipp": {
+        "seconds": 0.0575166,
+        "rss_mb": 78.1758,
+        "makespan": 1004.7,
+        "total_finish": 4189.3,
+        "wait": 0.1,
+        "expanded": 10277,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.0541249,
+        "rss_mb": 78.125,
+        "makespan": 1004.7,
+        "total_finish": 4189.3,
+        "wait": 0.1,
+        "expanded": 10277,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    },
+    {
+      "scenario": "bdz1/04_five_robot_types_50_points",
+      "rotation": 4,
+      "sipp": {
+        "seconds": 0.0556757,
+        "rss_mb": 77.3984,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 10278,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.0621885,
+        "rss_mb": 77.5703,
+        "makespan": 1004.7,
+        "total_finish": 4190.4,
+        "wait": 1.2,
+        "expanded": 10278,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      }
+    }
+  ],
+  "stress_comparisons": [
+    {
+      "variant": "service_x1.5",
+      "service_scale": 1.5,
+      "speed_scale": 1,
+      "sipp": {
+        "seconds": 0.112714,
+        "rss_mb": 78,
+        "makespan": 1974.6,
+        "total_finish": 7682.2,
+        "wait": 1505,
+        "expanded": 15764,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.206242,
+        "rss_mb": 79.2969,
+        "makespan": 1428.2,
+        "total_finish": 6834.2,
+        "wait": 657,
+        "expanded": 15764,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 1,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0839577,
+        "repair_expanded": 8185,
+        "repair_robots": [
+          5,
+          1,
+          3
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "variant": "service_x2",
+      "service_scale": 2,
+      "speed_scale": 1,
+      "sipp": {
+        "seconds": 0.11872,
+        "rss_mb": 78.75,
+        "makespan": 2060.6,
+        "total_finish": 8021,
+        "wait": 1535.4,
+        "expanded": 17424,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.225259,
+        "rss_mb": 80.8828,
+        "makespan": 1501.6,
+        "total_finish": 7135.4,
+        "wait": 649.8,
+        "expanded": 17424,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 1,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0950843,
+        "repair_expanded": 9091,
+        "repair_robots": [
+          5,
+          1,
+          3
+        ],
+        "repeats": 3
+      }
+    },
+    {
+      "variant": "speed_x0.9",
+      "service_scale": 1,
+      "speed_scale": 0.9,
+      "sipp": {
+        "seconds": 0.135648,
+        "rss_mb": 77.9961,
+        "makespan": 1596,
+        "total_finish": 7560.2,
+        "wait": 1255.2,
+        "expanded": 13139,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 0,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0,
+        "repair_expanded": 0,
+        "repair_robots": [],
+        "repeats": 3
+      },
+      "repair": {
+        "seconds": 0.212706,
+        "rss_mb": 80.1328,
+        "makespan": 1596,
+        "total_finish": 7560.2,
+        "wait": 1255.2,
+        "expanded": 13139,
+        "cbs": 0,
+        "unsafe": 0,
+        "repair_attempted": 1,
+        "repair_accepted": 0,
+        "repair_budget_exhausted": 0,
+        "repair_seconds": 0.0899765,
+        "repair_expanded": 7418,
+        "repair_robots": [
+          5,
+          0,
+          1
+        ],
+        "repeats": 3
+      }
+    }
+  ],
+  "export_validation": {
+    "passed": true,
+    "map_pixels": [
+      1564,
+      1472
+    ],
+    "map_resolution_m": 0.1,
+    "robots": 6,
+    "unique_sites": 80,
+    "tasks": 100,
+    "categories": 21,
+    "requirement_sizes": {
+      "1": 20,
+      "2": 40,
+      "3": 40
+    },
+    "high_priority_tasks": 34,
+    "merged_stops": 20,
+    "idle_robots": 0,
+    "coordination": {
+      "method": "prioritized",
+      "prioritized_succeeded": true,
+      "cbs_started": false,
+      "cbs_succeeded": false,
+      "total_wait_ticks": 3263,
+      "safe_interval_expanded_nodes": 13733,
+      "reservation_intervals": 85266,
+      "local_repair": {
+        "attempted": true,
+        "accepted": true,
+        "budget_exhausted": false,
+        "seconds": 0.099142721,
+        "expanded_nodes": 7016,
+        "makespan_before_ticks": 9338,
+        "makespan_after_ticks": 6819,
+        "robot_indices": [
+          5,
+          1,
+          3
+        ]
+      }
+    },
+    "checked_ticks": 6820,
+    "checked_robot_pairs": 15,
+    "baseline_unsafe_pair_ticks": 200,
+    "coordinated_unsafe_pair_ticks": 0,
+    "minimum_swept_separation_m": 0.715542,
+    "minimum_obstacle_clearance_m": 0.477501,
+    "makespan_seconds": 1363.8,
+    "total_wait_seconds": 652.6,
+    "per_robot": [
+      {
+        "robot": "fire-camera-gas",
+        "tasks": 12,
+        "stops": 8,
+        "finish_seconds": 1105.4,
+        "wait_seconds": 0.0,
+        "wait_events": 0,
+        "minimum_clearance_m": 0.477501
+      },
+      {
+        "robot": "camera-thermal-delivery",
+        "tasks": 18,
+        "stops": 14,
+        "finish_seconds": 1131.0,
+        "wait_seconds": 136.0,
+        "wait_events": 2,
+        "minimum_clearance_m": 0.506288
+      },
+      {
+        "robot": "fire-thermal-delivery",
+        "tasks": 23,
+        "stops": 20,
+        "finish_seconds": 1089.0,
+        "wait_seconds": 0.0,
+        "wait_events": 0,
+        "minimum_clearance_m": 0.573001
+      },
+      {
+        "robot": "fire-delivery-gas",
+        "tasks": 14,
+        "stops": 11,
+        "finish_seconds": 1363.8,
+        "wait_seconds": 416.8,
+        "wait_events": 5,
+        "minimum_clearance_m": 0.506288
+      },
+      {
+        "robot": "camera-thermal-gas",
+        "tasks": 18,
+        "stops": 15,
+        "finish_seconds": 776.0,
+        "wait_seconds": 96.2,
+        "wait_events": 1,
+        "minimum_clearance_m": 0.506288
+      },
+      {
+        "robot": "camera-delivery-gas",
+        "tasks": 15,
+        "stops": 12,
+        "finish_seconds": 1009.8,
+        "wait_seconds": 3.6,
+        "wait_events": 14,
+        "minimum_clearance_m": 0.573001
+      }
+    ],
+    "gif": {
+      "pixels": [
+        1600,
+        1210
+      ],
+      "frames": 476,
+      "seconds": 46.47,
+      "bytes": 2691529,
+      "frames_with_wait_halo": 196
+    },
+    "runtime": {
+      "timing_allocation_seconds": 0.469641,
+      "timing_estimate_precompute_seconds": 0.450144,
+      "timing_final_path_seconds": 0.046716,
+      "timing_coordination_seconds": 0.227232,
+      "peak_rss_mb": 117.715,
+      "timing_load_and_parse_seconds": 0.0114152,
+      "timing_planning_seconds": 0.745864,
+      "timing_export_seconds": 7.07402,
+      "timing_total_seconds": 7.8313
+    }
+  }
+}

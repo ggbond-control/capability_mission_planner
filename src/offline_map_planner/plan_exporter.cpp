@@ -207,7 +207,23 @@ namespace capability_mission_planner::offline
                    << ", \"prioritized_succeeded\": " << (plan.coordination_stats.prioritized_succeeded ? "true" : "false")
                    << ", \"cbs_started\": " << (plan.coordination_stats.cbs_started ? "true" : "false")
                    << ", \"cbs_succeeded\": " << (plan.coordination_stats.cbs_succeeded ? "true" : "false")
-                   << ", \"total_wait_ticks\": " << plan.coordination_stats.total_wait_ticks << "},\n";
+                   << ", \"total_wait_ticks\": " << plan.coordination_stats.total_wait_ticks
+                   << ", \"safe_interval_expanded_nodes\": " << plan.coordination_stats.safe_interval_expanded_nodes
+                   << ", \"reservation_intervals\": " << plan.coordination_stats.reservation_intervals
+                   << ", \"local_repair\": {\"attempted\": " << (plan.coordination_stats.local_repair_attempted ? "true" : "false")
+                   << ", \"accepted\": " << (plan.coordination_stats.local_repair_accepted ? "true" : "false")
+                   << ", \"budget_exhausted\": " << (plan.coordination_stats.local_repair_budget_exhausted ? "true" : "false")
+                   << ", \"seconds\": " << plan.coordination_stats.local_repair_seconds
+                   << ", \"expanded_nodes\": " << plan.coordination_stats.local_repair_expanded_nodes
+                   << ", \"makespan_before_ticks\": " << plan.coordination_stats.local_repair_makespan_before_ticks
+                   << ", \"makespan_after_ticks\": " << plan.coordination_stats.local_repair_makespan_after_ticks
+                   << ", \"robot_indices\": [";
+            for (std::size_t i = 0; i < plan.coordination_stats.local_repair_robots.size(); ++i)
+            {
+                if (i) output << ',';
+                output << plan.coordination_stats.local_repair_robots[i];
+            }
+            output << "]}},\n";
             output << "  \"maps\": [";
             std::size_t map_index = 0;
             for (const auto &[id, map] : bundle.maps)
@@ -296,6 +312,7 @@ namespace capability_mission_planner::offline
             output << "total_load_seconds="
                    << plan.total_load_ticks * plan.time_step_seconds << "\n\n";
             output << "coordination_method=" << coordination_method(plan) << '\n'
+                   << "coordination_local_repair_accepted=" << (plan.coordination_stats.local_repair_accepted ? "true" : "false") << '\n'
                    << "coordination_wait_seconds="
                    << plan.coordination_stats.total_wait_ticks * plan.time_step_seconds << "\n\n";
             for (const auto &route : plan.routes)

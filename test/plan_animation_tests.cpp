@@ -207,6 +207,22 @@ int main(int argc, char *argv[])
         try { (void)OfflinePlannerConfigLoader::load(config_path); }
         catch (const std::runtime_error &) { rejected = true; }
         require(rejected, "invalid YAML animation speedup must fail");
+        config["export"]["animation_speedup"] = 3;
+        config["planner"]["traversal"]["coordination_local_repair"] = false;
+        config["planner"]["traversal"]["coordination_repair_budget_seconds"] = 0.05;
+        config["planner"]["traversal"]["coordination_repair_max_expanded_nodes"] = 1234;
+        { std::ofstream file(config_path); file << config; }
+        const auto repair_config = OfflinePlannerConfigLoader::load(config_path);
+        require(!repair_config.traversal.coordination_local_repair &&
+                repair_config.traversal.coordination_repair_budget_seconds == .05 &&
+                repair_config.traversal.coordination_repair_max_expanded_nodes == 1234,
+                "YAML repair options were not loaded");
+        config["planner"]["traversal"]["coordination_repair_budget_seconds"] = 0;
+        { std::ofstream file(config_path); file << config; }
+        rejected = false;
+        try { (void)OfflinePlannerConfigLoader::load(config_path); }
+        catch (const std::runtime_error &) { rejected = true; }
+        require(rejected, "invalid YAML repair budget must fail");
         if (argc == 2)
         {
             // Optional review artifact from the exact CBS fixture validated above.

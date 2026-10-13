@@ -111,7 +111,21 @@ int main(int argc, char *argv[])
                   << "  coordination_conflict_check_seconds: "
                   << plan.coordination_stats.conflict_check_seconds << '\n'
                   << "  coordination_total_wait_seconds: "
-                  << plan.coordination_stats.total_wait_ticks * plan.time_step_seconds << '\n';
+                  << plan.coordination_stats.total_wait_ticks * plan.time_step_seconds << '\n'
+                  << "  coordination_reservation_intervals: " << plan.coordination_stats.reservation_intervals << '\n'
+                  << "  coordination_reservation_queries: " << plan.coordination_stats.reservation_queries << '\n'
+                  << "  coordination_safe_interval_expanded_nodes: " << plan.coordination_stats.safe_interval_expanded_nodes << '\n'
+                  << "  coordination_local_repair_attempted: " << (plan.coordination_stats.local_repair_attempted ? "true" : "false") << '\n'
+                  << "  coordination_local_repair_accepted: " << (plan.coordination_stats.local_repair_accepted ? "true" : "false") << '\n'
+                  << "  coordination_local_repair_budget_exhausted: " << (plan.coordination_stats.local_repair_budget_exhausted ? "true" : "false") << '\n'
+                  << "  coordination_local_repair_seconds: " << plan.coordination_stats.local_repair_seconds << '\n'
+                  << "  coordination_local_repair_expanded_nodes: " << plan.coordination_stats.local_repair_expanded_nodes << '\n'
+                  << "  coordination_local_repair_makespan_before_seconds: " << plan.coordination_stats.local_repair_makespan_before_ticks * plan.time_step_seconds << '\n'
+                  << "  coordination_local_repair_makespan_after_seconds: " << plan.coordination_stats.local_repair_makespan_after_ticks * plan.time_step_seconds << '\n';
+        std::cout << "  coordination_local_repair_robots:";
+        for (auto robot : plan.coordination_stats.local_repair_robots)
+            std::cout << ' ' << request.robots.at(robot).id;
+        std::cout << '\n';
         for (std::size_t i = 0; i < plan.coordination_stats.route_frames_by_robot.size(); ++i)
         {
             const auto &frame_expansions = plan.coordination_stats.prioritized_frame_expansions_by_robot[i];

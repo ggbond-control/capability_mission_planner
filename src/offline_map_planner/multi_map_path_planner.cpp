@@ -412,6 +412,10 @@ namespace capability_mission_planner::offline
             throw std::invalid_argument("multi-map bundle must not be null");
         if (!(_options.time_step_seconds > 0.0) || !(_options.nominal_speed_mps > 0.0))
             throw std::invalid_argument("time step and nominal speed must be positive");
+        if (!std::isfinite(_options.coordination_repair_budget_seconds) ||
+            _options.coordination_repair_budget_seconds <= 0.0 ||
+            _options.coordination_repair_max_expanded_nodes == 0U)
+            throw std::invalid_argument("local repair requires a finite positive time and node budget");
     }
 
     MultiMapPath MultiMapPathPlanner::plan(

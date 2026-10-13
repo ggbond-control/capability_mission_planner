@@ -1,0 +1,3182 @@
+{
+  "date": "2026-10-13",
+  "planner_reference_commit": "c35a9f4de64d3fef61dc8fb0052939ff8efcff6f",
+  "build": "Release",
+  "cpu": "Intel Core i9-12900H",
+  "algorithm_changes_in_this_experiment": false,
+  "coverage": [
+    {
+      "scenario": "01_six_robots_80_sites_100_tasks",
+      "robots": 6,
+      "sites": 80,
+      "tasks": 100,
+      "coverage": {
+        "zones": 1,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 8763,
+        "deployed_zone_area_fraction": 0.5461174124392372,
+        "zone_8m_bins": 94,
+        "task_8m_bins": 63,
+        "task_bin_coverage_fraction": 0.6702127659574468,
+        "nearest_task_distance_p95_m": 4.47213595499958,
+        "nearest_task_distance_max_m": 11.271202242884298,
+        "task_grid_bbox": [
+          [
+            122,
+            74
+          ],
+          [
+            1454,
+            1118
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "02_six_robots_160_sites_220_tasks",
+      "robots": 6,
+      "sites": 160,
+      "tasks": 220,
+      "deployment": "interior",
+      "planning_clearance_components": 1,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 6,
+          "planning_clearance_component": 2,
+          "sites": 160,
+          "coarse_cells": 8763
+        }
+      ],
+      "coverage": {
+        "zones": 1,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 8763,
+        "deployed_zone_area_fraction": 0.5461174124392372,
+        "zone_8m_bins": 94,
+        "task_8m_bins": 75,
+        "task_bin_coverage_fraction": 0.7978723404255319,
+        "nearest_task_distance_p95_m": 2.5612496949731396,
+        "nearest_task_distance_max_m": 10.807404868885037,
+        "task_grid_bbox": [
+          [
+            62,
+            74
+          ],
+          [
+            1454,
+            1190
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "03_twelve_robots_240_sites_360_tasks",
+      "robots": 12,
+      "sites": 240,
+      "tasks": 360,
+      "deployment": "interior",
+      "planning_clearance_components": 1,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 12,
+          "planning_clearance_component": 2,
+          "sites": 240,
+          "coarse_cells": 8763
+        }
+      ],
+      "coverage": {
+        "zones": 1,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 8763,
+        "deployed_zone_area_fraction": 0.5461174124392372,
+        "zone_8m_bins": 94,
+        "task_8m_bins": 81,
+        "task_bin_coverage_fraction": 0.8617021276595744,
+        "nearest_task_distance_p95_m": 2.0,
+        "nearest_task_distance_max_m": 10.807404868885037,
+        "task_grid_bbox": [
+          [
+            62,
+            74
+          ],
+          [
+            1454,
+            1190
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "04_twelve_robots_240_sites_360_tasks_two_zones",
+      "robots": 12,
+      "sites": 240,
+      "tasks": 360,
+      "deployment": "interior",
+      "planning_clearance_components": 2,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 6,
+          "planning_clearance_component": 2,
+          "sites": 170,
+          "coarse_cells": 8763
+        },
+        {
+          "zone": "zone_02",
+          "component_label": 39,
+          "robots": 6,
+          "planning_clearance_component": 46,
+          "sites": 70,
+          "coarse_cells": 2973
+        }
+      ],
+      "coverage": {
+        "zones": 2,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 11736,
+        "deployed_zone_area_fraction": 0.7313972329552536,
+        "zone_8m_bins": 126,
+        "task_8m_bins": 106,
+        "task_bin_coverage_fraction": 0.8412698412698413,
+        "nearest_task_distance_p95_m": 2.529822128134704,
+        "nearest_task_distance_max_m": 10.807404868885037,
+        "task_grid_bbox": [
+          [
+            62,
+            74
+          ],
+          [
+            1454,
+            1190
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "05_twenty_robots_320_sites_480_tasks_ten_zones",
+      "robots": 20,
+      "sites": 320,
+      "tasks": 480,
+      "deployment": "interior",
+      "planning_clearance_components": 4,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 6,
+          "planning_clearance_component": 2,
+          "sites": 170,
+          "coarse_cells": 8763
+        },
+        {
+          "zone": "zone_02",
+          "component_label": 39,
+          "robots": 6,
+          "planning_clearance_component": 46,
+          "sites": 70,
+          "coarse_cells": 2973
+        },
+        {
+          "zone": "zone_03",
+          "component_label": 37,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 15,
+          "coarse_cells": 340
+        },
+        {
+          "zone": "zone_04",
+          "component_label": 38,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 12,
+          "coarse_cells": 277
+        },
+        {
+          "zone": "zone_05",
+          "component_label": 45,
+          "robots": 1,
+          "planning_clearance_component": 2,
+          "sites": 12,
+          "coarse_cells": 257
+        },
+        {
+          "zone": "zone_06",
+          "component_label": 206,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 10,
+          "coarse_cells": 214
+        },
+        {
+          "zone": "zone_07",
+          "component_label": 193,
+          "robots": 1,
+          "planning_clearance_component": 233,
+          "sites": 10,
+          "coarse_cells": 176
+        },
+        {
+          "zone": "zone_08",
+          "component_label": 51,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 8,
+          "coarse_cells": 153
+        },
+        {
+          "zone": "zone_09",
+          "component_label": 245,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 7,
+          "coarse_cells": 119
+        },
+        {
+          "zone": "zone_10",
+          "component_label": 252,
+          "robots": 1,
+          "planning_clearance_component": 299,
+          "sites": 6,
+          "coarse_cells": 100
+        }
+      ],
+      "coverage": {
+        "zones": 10,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 13372,
+        "deployed_zone_area_fraction": 0.8333541069425402,
+        "zone_8m_bins": 148,
+        "task_8m_bins": 129,
+        "task_bin_coverage_fraction": 0.8716216216216216,
+        "nearest_task_distance_p95_m": 2.4766277143261197,
+        "nearest_task_distance_max_m": 10.807404868885037,
+        "task_grid_bbox": [
+          [
+            62,
+            74
+          ],
+          [
+            1454,
+            1190
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "06_six_robots_160_sites_220_tasks_dispersed",
+      "robots": 6,
+      "sites": 160,
+      "tasks": 220,
+      "deployment": "dispersed",
+      "planning_clearance_components": 1,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 6,
+          "planning_clearance_component": 2,
+          "sites": 160,
+          "coarse_cells": 8763
+        }
+      ],
+      "coverage": {
+        "zones": 1,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 8763,
+        "deployed_zone_area_fraction": 0.5461174124392372,
+        "zone_8m_bins": 94,
+        "task_8m_bins": 84,
+        "task_bin_coverage_fraction": 0.8936170212765957,
+        "nearest_task_distance_p95_m": 2.5612496949731396,
+        "nearest_task_distance_max_m": 3.2984845004941286,
+        "task_grid_bbox": [
+          [
+            58,
+            74
+          ],
+          [
+            1454,
+            1194
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "07_twelve_robots_240_sites_360_tasks_dispersed",
+      "robots": 12,
+      "sites": 240,
+      "tasks": 360,
+      "deployment": "dispersed",
+      "planning_clearance_components": 1,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 12,
+          "planning_clearance_component": 2,
+          "sites": 240,
+          "coarse_cells": 8763
+        }
+      ],
+      "coverage": {
+        "zones": 1,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 8763,
+        "deployed_zone_area_fraction": 0.5461174124392372,
+        "zone_8m_bins": 94,
+        "task_8m_bins": 90,
+        "task_bin_coverage_fraction": 0.9574468085106383,
+        "nearest_task_distance_p95_m": 2.039607805437114,
+        "nearest_task_distance_max_m": 2.529822128134704,
+        "task_grid_bbox": [
+          [
+            58,
+            74
+          ],
+          [
+            1454,
+            1194
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "08_twelve_robots_240_sites_360_tasks_two_zones_dispersed",
+      "robots": 12,
+      "sites": 240,
+      "tasks": 360,
+      "deployment": "dispersed",
+      "planning_clearance_components": 2,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 6,
+          "planning_clearance_component": 2,
+          "sites": 170,
+          "coarse_cells": 8763
+        },
+        {
+          "zone": "zone_02",
+          "component_label": 39,
+          "robots": 6,
+          "planning_clearance_component": 46,
+          "sites": 70,
+          "coarse_cells": 2973
+        }
+      ],
+      "coverage": {
+        "zones": 2,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 11736,
+        "deployed_zone_area_fraction": 0.7313972329552536,
+        "zone_8m_bins": 126,
+        "task_8m_bins": 115,
+        "task_bin_coverage_fraction": 0.9126984126984127,
+        "nearest_task_distance_p95_m": 2.433105012119288,
+        "nearest_task_distance_max_m": 3.2,
+        "task_grid_bbox": [
+          [
+            58,
+            74
+          ],
+          [
+            1454,
+            1194
+          ]
+        ]
+      }
+    },
+    {
+      "scenario": "09_twenty_robots_320_sites_480_tasks_ten_zones_dispersed",
+      "robots": 20,
+      "sites": 320,
+      "tasks": 480,
+      "deployment": "dispersed",
+      "planning_clearance_components": 4,
+      "categories": 21,
+      "zones": [
+        {
+          "zone": "zone_01",
+          "component_label": 3,
+          "robots": 6,
+          "planning_clearance_component": 2,
+          "sites": 170,
+          "coarse_cells": 8763
+        },
+        {
+          "zone": "zone_02",
+          "component_label": 39,
+          "robots": 6,
+          "planning_clearance_component": 46,
+          "sites": 70,
+          "coarse_cells": 2973
+        },
+        {
+          "zone": "zone_03",
+          "component_label": 37,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 15,
+          "coarse_cells": 340
+        },
+        {
+          "zone": "zone_04",
+          "component_label": 38,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 12,
+          "coarse_cells": 277
+        },
+        {
+          "zone": "zone_05",
+          "component_label": 45,
+          "robots": 1,
+          "planning_clearance_component": 2,
+          "sites": 12,
+          "coarse_cells": 257
+        },
+        {
+          "zone": "zone_06",
+          "component_label": 206,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 10,
+          "coarse_cells": 214
+        },
+        {
+          "zone": "zone_07",
+          "component_label": 193,
+          "robots": 1,
+          "planning_clearance_component": 233,
+          "sites": 10,
+          "coarse_cells": 176
+        },
+        {
+          "zone": "zone_08",
+          "component_label": 51,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 8,
+          "coarse_cells": 153
+        },
+        {
+          "zone": "zone_09",
+          "component_label": 245,
+          "robots": 1,
+          "planning_clearance_component": 46,
+          "sites": 7,
+          "coarse_cells": 119
+        },
+        {
+          "zone": "zone_10",
+          "component_label": 252,
+          "robots": 1,
+          "planning_clearance_component": 299,
+          "sites": 6,
+          "coarse_cells": 100
+        }
+      ],
+      "coverage": {
+        "zones": 10,
+        "conservative_coarse_cells_total": 16046,
+        "deployed_zone_coarse_cells": 13372,
+        "deployed_zone_area_fraction": 0.8333541069425402,
+        "zone_8m_bins": 148,
+        "task_8m_bins": 135,
+        "task_bin_coverage_fraction": 0.9121621621621622,
+        "nearest_task_distance_p95_m": 2.433105012119288,
+        "nearest_task_distance_max_m": 3.2,
+        "task_grid_bbox": [
+          [
+            58,
+            74
+          ],
+          [
+            1454,
+            1194
+          ]
+        ]
+      }
+    }
+  ],
+  "bdz1_comparisons": [
+    {
+      "scenario": "bdz1/04_five_robot_types_50_points",
+      "original": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.048904,
+            "rss_mb": 77.6914,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 41982,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.049546,
+            "rss_mb": 77.1602,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 41982,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0523901,
+            "rss_mb": 77.2695,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 41982,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        }
+      ],
+      "safe_tick": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0285542,
+            "rss_mb": 77.3711,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 41982,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0288082,
+            "rss_mb": 77.2266,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 41982,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0286989,
+            "rss_mb": 77.2227,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 41982,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        }
+      ],
+      "sipp": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0509225,
+            "rss_mb": 77.1133,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 10278,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0501827,
+            "rss_mb": 76.6328,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 10278,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0502066,
+            "rss_mb": 77.2266,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 10278,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        }
+      ],
+      "repair": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0496895,
+            "rss_mb": 77.7266,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 10278,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0500526,
+            "rss_mb": 77.4102,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 10278,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0527639,
+            "rss_mb": 77.4648,
+            "makespan": 1004.7,
+            "total_finish": 4190.4,
+            "wait": 1.2,
+            "expanded": 10278,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        }
+      ],
+      "config_sha256": "423c1ca1858cc95b317a74c809c14445f828c2026d5377bbed8bc480581e10c7"
+    },
+    {
+      "scenario": "bdz1/05_five_robot_types_60_points",
+      "original": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 1.27758,
+            "rss_mb": 162.043,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 775769,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 1.27231,
+            "rss_mb": 162.289,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 775769,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 1.25393,
+            "rss_mb": 161.984,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 775769,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        }
+      ],
+      "safe_tick": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.942081,
+            "rss_mb": 163.121,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 775769,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.981485,
+            "rss_mb": 163.02,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 775769,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.975615,
+            "rss_mb": 162.539,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 775769,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        }
+      ],
+      "sipp": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.047486,
+            "rss_mb": 77.1523,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 11255,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0521325,
+            "rss_mb": 77.4648,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 11255,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0487243,
+            "rss_mb": 77.2773,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 11255,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        }
+      ],
+      "repair": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0812495,
+            "rss_mb": 78.1445,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 11255,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 1,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0.0295908,
+            "repair_expanded": 5012,
+            "repair_robots": [
+              3,
+              1
+            ]
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0814314,
+            "rss_mb": 78.1094,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 11255,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 1,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0.0299804,
+            "repair_expanded": 5012,
+            "repair_robots": [
+              3,
+              1
+            ]
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0827768,
+            "rss_mb": 77.7734,
+            "makespan": 1008,
+            "total_finish": 4209,
+            "wait": 100.7,
+            "expanded": 11255,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 1,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0.0297119,
+            "repair_expanded": 5012,
+            "repair_robots": [
+              3,
+              1
+            ]
+          },
+          "error": ""
+        }
+      ],
+      "config_sha256": "35f17a4640a11cbaac52eb0dfc80e1f978dd722adfeabd089c2ef7cb24e66a8e"
+    },
+    {
+      "scenario": "bdz1/06_five_robot_types_80_points",
+      "original": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0542698,
+            "rss_mb": 77.5234,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 41905,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0506608,
+            "rss_mb": 77.4883,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 41905,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0491781,
+            "rss_mb": 77.7852,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 41905,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        }
+      ],
+      "safe_tick": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0306211,
+            "rss_mb": 77.1484,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 41905,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0312944,
+            "rss_mb": 77.4609,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 41905,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0318618,
+            "rss_mb": 77.3828,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 41905,
+            "cbs": 0,
+            "unsafe": 0
+          },
+          "error": ""
+        }
+      ],
+      "sipp": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0503022,
+            "rss_mb": 77.5,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 11649,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0558751,
+            "rss_mb": 77.4609,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 11649,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0576447,
+            "rss_mb": 77.8086,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 11649,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        }
+      ],
+      "repair": [
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0575002,
+            "rss_mb": 77.2148,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 11649,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.057253,
+            "rss_mb": 77.3633,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 11649,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        },
+        {
+          "exit": 0,
+          "metrics": {
+            "seconds": 0.0518006,
+            "rss_mb": 77.5,
+            "makespan": 1024.7,
+            "total_finish": 4190,
+            "wait": 0,
+            "expanded": 11649,
+            "cbs": 0,
+            "unsafe": 0,
+            "repair_attempted": 0,
+            "repair_accepted": 0,
+            "repair_budget_exhausted": 0,
+            "repair_seconds": 0,
+            "repair_expanded": 0,
+            "repair_robots": []
+          },
+          "error": ""
+        }
+      ],
+      "config_sha256": "0b17a1e6095b2930ee3191921fdb44246077e0ef6d64f8cfb029c24d803827c8"
+    }
+  ],
+  "sxbdz1_comparisons": {
+    "limits": {
+      "wall_seconds": 40.0,
+      "address_space_mb": 2048
+    },
+    "repeats": 3,
+    "backends": {
+      "original": "/tmp/cmp_coordination_optimization/baseline/probe",
+      "safe_tick": "/tmp/cmp_coordination_optimization/stages/safety_probe",
+      "sipp": "/home/jazzy/cpp/capability_mission_planner/build/coordination_benchmark",
+      "repair": "/home/jazzy/cpp/capability_mission_planner/build/coordination_benchmark"
+    },
+    "cases": [
+      {
+        "scenario": "sxbdz1/06_six_robots_160_sites_220_tasks_dispersed",
+        "config_sha256": "d327fd29ca858bdcf942057c02cc3f56dc955ac6f2ee76ac953e3ca81cc26687",
+        "backends": {
+          "original": {
+            "samples": [
+              {
+                "exit": 3,
+                "metrics": {
+                  "seconds": 4.62654,
+                  "rss_mb": 212.762,
+                  "makespan": 1698,
+                  "total_finish": 9508,
+                  "wait": 946.2,
+                  "expanded": 2493654,
+                  "cbs": 0,
+                  "unsafe": 1
+                },
+                "error": "",
+                "wall_seconds": 5.631723775994033
+              }
+            ]
+          },
+          "safe_tick": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 2.91788,
+                  "rss_mb": 213.16,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 2499639,
+                  "cbs": 0,
+                  "unsafe": 0
+                },
+                "error": "",
+                "wall_seconds": 3.9018730710085947
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 2.87193,
+                  "rss_mb": 213.367,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 2499639,
+                  "cbs": 0,
+                  "unsafe": 0
+                },
+                "error": "",
+                "wall_seconds": 3.840755100012757
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 2.90639,
+                  "rss_mb": 213.902,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 2499639,
+                  "cbs": 0,
+                  "unsafe": 0
+                },
+                "error": "",
+                "wall_seconds": 3.9264098569983616
+              }
+            ],
+            "median_seconds": 2.90639,
+            "median_rss_mb": 213.367
+          },
+          "sipp": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.149755,
+                  "rss_mb": 84.4297,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 22592,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 1.1318325399770401
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.15335,
+                  "rss_mb": 84.668,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 22592,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 1.1250023359898478
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.14764,
+                  "rss_mb": 84.7578,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 22592,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 1.1191090599750169
+              }
+            ],
+            "median_seconds": 0.149755,
+            "median_rss_mb": 84.668
+          },
+          "repair": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.262606,
+                  "rss_mb": 88.3828,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 22592,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.11552,
+                  "repair_expanded": 11567,
+                  "repair_robots": [
+                    5,
+                    0,
+                    2
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 1.240097710979171
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.26349,
+                  "rss_mb": 88.4414,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 22592,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.118942,
+                  "repair_expanded": 11567,
+                  "repair_robots": [
+                    5,
+                    0,
+                    2
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 1.2367808900016826
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.262868,
+                  "rss_mb": 87.918,
+                  "makespan": 1699.6,
+                  "total_finish": 9509.6,
+                  "wait": 947.8,
+                  "expanded": 22592,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.117768,
+                  "repair_expanded": 11567,
+                  "repair_robots": [
+                    5,
+                    0,
+                    2
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 1.2503721510001924
+              }
+            ],
+            "median_seconds": 0.262868,
+            "median_rss_mb": 88.3828
+          }
+        },
+        "mandatory_frames_preserved": true,
+        "safe_tick_mandatory_frames_preserved": true
+      },
+      {
+        "scenario": "sxbdz1/07_twelve_robots_240_sites_360_tasks_dispersed",
+        "config_sha256": "6eef24a41b3d5301198ceaafb6dcb1a0bfa070470668c6f390ec92d94679cb6a",
+        "backends": {
+          "original": {
+            "samples": [
+              {
+                "exit": 1,
+                "metrics": {},
+                "error": "multi-map CBS reached its high-level node limit\n",
+                "wall_seconds": 36.14794536901172
+              }
+            ]
+          },
+          "safe_tick": {
+            "samples": [
+              {
+                "exit": 1,
+                "metrics": {},
+                "error": "multi-map CBS reached its high-level node limit\n",
+                "wall_seconds": 16.225413478008704
+              }
+            ]
+          },
+          "sipp": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.262278,
+                  "rss_mb": 101.395,
+                  "makespan": 1680.2,
+                  "total_finish": 13794.6,
+                  "wait": 2108.8,
+                  "expanded": 36427,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 1.9926288670103531
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.286056,
+                  "rss_mb": 101.016,
+                  "makespan": 1680.2,
+                  "total_finish": 13794.6,
+                  "wait": 2108.8,
+                  "expanded": 36427,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 2.023060934006935
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.27063,
+                  "rss_mb": 101.738,
+                  "makespan": 1680.2,
+                  "total_finish": 13794.6,
+                  "wait": 2108.8,
+                  "expanded": 36427,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 2.0273899949970655
+              }
+            ],
+            "median_seconds": 0.27063,
+            "median_rss_mb": 101.395
+          },
+          "repair": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.394075,
+                  "rss_mb": 101.129,
+                  "makespan": 1485.4,
+                  "total_finish": 13612,
+                  "wait": 1926.2,
+                  "expanded": 36427,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 1,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.135216,
+                  "repair_expanded": 11839,
+                  "repair_robots": [
+                    10,
+                    4,
+                    9
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 2.13268920299015
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.389919,
+                  "rss_mb": 101.469,
+                  "makespan": 1485.4,
+                  "total_finish": 13612,
+                  "wait": 1926.2,
+                  "expanded": 36427,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 1,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.133036,
+                  "repair_expanded": 11839,
+                  "repair_robots": [
+                    10,
+                    4,
+                    9
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 2.089273971010698
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.410724,
+                  "rss_mb": 101.766,
+                  "makespan": 1485.4,
+                  "total_finish": 13612,
+                  "wait": 1926.2,
+                  "expanded": 36427,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 1,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.140272,
+                  "repair_expanded": 11839,
+                  "repair_robots": [
+                    10,
+                    4,
+                    9
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 2.157292695977958
+              }
+            ],
+            "median_seconds": 0.394075,
+            "median_rss_mb": 101.469
+          }
+        },
+        "mandatory_frames_preserved": true
+      },
+      {
+        "scenario": "sxbdz1/08_twelve_robots_240_sites_360_tasks_two_zones_dispersed",
+        "config_sha256": "62ed28cd85da1df7d5347c6662b532f8cfb68ab3559c021330585cef31fe95b0",
+        "backends": {
+          "original": {
+            "samples": [
+              {
+                "exit": 1,
+                "metrics": {},
+                "error": "multi-map CBS reached its high-level node limit\n",
+                "wall_seconds": 16.714206450007623
+              }
+            ]
+          },
+          "safe_tick": {
+            "samples": [
+              {
+                "exit": 1,
+                "metrics": {},
+                "error": "multi-map CBS reached its high-level node limit\n",
+                "wall_seconds": 12.923715847020503
+              }
+            ]
+          },
+          "sipp": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.21951,
+                  "rss_mb": 89.0781,
+                  "makespan": 1815.4,
+                  "total_finish": 12499.8,
+                  "wait": 880.4,
+                  "expanded": 32241,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 1.8499281399999745
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.207197,
+                  "rss_mb": 88.8594,
+                  "makespan": 1815.4,
+                  "total_finish": 12499.8,
+                  "wait": 880.4,
+                  "expanded": 32241,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 1.7874519450124353
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.218618,
+                  "rss_mb": 89.1055,
+                  "makespan": 1815.4,
+                  "total_finish": 12499.8,
+                  "wait": 880.4,
+                  "expanded": 32241,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 1.7709874300053343
+              }
+            ],
+            "median_seconds": 0.218618,
+            "median_rss_mb": 89.0781
+          },
+          "repair": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.306862,
+                  "rss_mb": 91.6523,
+                  "makespan": 1815.4,
+                  "total_finish": 12499.8,
+                  "wait": 880.4,
+                  "expanded": 32241,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.0881707,
+                  "repair_expanded": 8367,
+                  "repair_robots": [
+                    2,
+                    1
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 1.9240288890141528
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.316435,
+                  "rss_mb": 92.5547,
+                  "makespan": 1815.4,
+                  "total_finish": 12499.8,
+                  "wait": 880.4,
+                  "expanded": 32241,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.0924912,
+                  "repair_expanded": 8367,
+                  "repair_robots": [
+                    2,
+                    1
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 1.9710709259961732
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.299318,
+                  "rss_mb": 92.207,
+                  "makespan": 1815.4,
+                  "total_finish": 12499.8,
+                  "wait": 880.4,
+                  "expanded": 32241,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.0856336,
+                  "repair_expanded": 8367,
+                  "repair_robots": [
+                    2,
+                    1
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 1.8847205589991063
+              }
+            ],
+            "median_seconds": 0.306862,
+            "median_rss_mb": 92.207
+          }
+        },
+        "mandatory_frames_preserved": true
+      },
+      {
+        "scenario": "sxbdz1/09_twenty_robots_320_sites_480_tasks_ten_zones_dispersed",
+        "config_sha256": "c5413cc42c27e11679945bfb224ea41d7ac2857c29e7bee90146260179864e54",
+        "backends": {
+          "original": {
+            "samples": [
+              {
+                "exit": 1,
+                "metrics": {},
+                "error": "multi-map CBS reached its high-level node limit\n",
+                "wall_seconds": 32.35300719999941
+              }
+            ]
+          },
+          "safe_tick": {
+            "samples": [
+              {
+                "exit": 1,
+                "metrics": {},
+                "error": "multi-map CBS reached its high-level node limit\n",
+                "wall_seconds": 21.49045969400322
+              }
+            ]
+          },
+          "sipp": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.284936,
+                  "rss_mb": 96.7812,
+                  "makespan": 2205.2,
+                  "total_finish": 15186,
+                  "wait": 1806.6,
+                  "expanded": 40454,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 3.4134377030131873
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.287065,
+                  "rss_mb": 96.3594,
+                  "makespan": 2205.2,
+                  "total_finish": 15186,
+                  "wait": 1806.6,
+                  "expanded": 40454,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 3.5987759240088053
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.278372,
+                  "rss_mb": 96.4297,
+                  "makespan": 2205.2,
+                  "total_finish": 15186,
+                  "wait": 1806.6,
+                  "expanded": 40454,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 0,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0,
+                  "repair_expanded": 0,
+                  "repair_robots": []
+                },
+                "error": "",
+                "wall_seconds": 3.3482887480058707
+              }
+            ],
+            "median_seconds": 0.284936,
+            "median_rss_mb": 96.4297
+          },
+          "repair": {
+            "samples": [
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.413381,
+                  "rss_mb": 96.1836,
+                  "makespan": 2205.2,
+                  "total_finish": 15186,
+                  "wait": 1806.6,
+                  "expanded": 40454,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.115597,
+                  "repair_expanded": 14085,
+                  "repair_robots": [
+                    3,
+                    0,
+                    1
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 3.597747302002972
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.405091,
+                  "rss_mb": 96.6328,
+                  "makespan": 2205.2,
+                  "total_finish": 15186,
+                  "wait": 1806.6,
+                  "expanded": 40454,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.114202,
+                  "repair_expanded": 14085,
+                  "repair_robots": [
+                    3,
+                    0,
+                    1
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 3.621230431017466
+              },
+              {
+                "exit": 0,
+                "metrics": {
+                  "seconds": 0.400401,
+                  "rss_mb": 96.4961,
+                  "makespan": 2205.2,
+                  "total_finish": 15186,
+                  "wait": 1806.6,
+                  "expanded": 40454,
+                  "cbs": 0,
+                  "unsafe": 0,
+                  "repair_attempted": 1,
+                  "repair_accepted": 0,
+                  "repair_budget_exhausted": 0,
+                  "repair_seconds": 0.114265,
+                  "repair_expanded": 14085,
+                  "repair_robots": [
+                    3,
+                    0,
+                    1
+                  ]
+                },
+                "error": "",
+                "wall_seconds": 3.488504420995014
+              }
+            ],
+            "median_seconds": 0.405091,
+            "median_rss_mb": 96.4961
+          }
+        },
+        "mandatory_frames_preserved": true
+      }
+    ]
+  },
+  "interior_current_failures": [
+    {
+      "scenario": "02_six_robots_160_sites_220_tasks",
+      "sipp": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 5.673167339002248
+      },
+      "repair": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 5.746913455979666
+      }
+    },
+    {
+      "scenario": "03_twelve_robots_240_sites_360_tasks",
+      "sipp": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 6.076020108012017
+      },
+      "repair": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 5.975267464993522
+      }
+    },
+    {
+      "scenario": "04_twelve_robots_240_sites_360_tasks_two_zones",
+      "sipp": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 9.138239152991446
+      },
+      "repair": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 8.967685366980731
+      }
+    },
+    {
+      "scenario": "05_twenty_robots_320_sites_480_tasks_ten_zones",
+      "sipp": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 10.70316317200195
+      },
+      "repair": {
+        "exit": 1,
+        "metrics": {},
+        "error": "multi-map CBS reached its high-level node limit\n",
+        "wall_seconds": 10.98747771300259
+      }
+    }
+  ],
+  "interior_reference_failures": [
+    {
+      "scenario": "02_six_robots_160_sites_220_tasks",
+      "mode": "original",
+      "exit": 1,
+      "metrics": {},
+      "error": "multi-map CBS reached its high-level node limit\n",
+      "wall_seconds": 5.572990159998881
+    },
+    {
+      "scenario": "02_six_robots_160_sites_220_tasks",
+      "mode": "safe_tick",
+      "exit": 1,
+      "metrics": {},
+      "error": "multi-map CBS reached its high-level node limit\n",
+      "wall_seconds": 5.58884129798389
+    },
+    {
+      "scenario": "03_twelve_robots_240_sites_360_tasks",
+      "mode": "original",
+      "exit": "timeout",
+      "wall_seconds": 40.09729030201561
+    },
+    {
+      "scenario": "03_twelve_robots_240_sites_360_tasks",
+      "mode": "safe_tick",
+      "exit": 1,
+      "metrics": {},
+      "error": "std::bad_alloc\n",
+      "wall_seconds": 34.52584649299388
+    },
+    {
+      "scenario": "04_twelve_robots_240_sites_360_tasks_two_zones",
+      "mode": "original",
+      "exit": "timeout",
+      "wall_seconds": 40.1162434789876
+    },
+    {
+      "scenario": "04_twelve_robots_240_sites_360_tasks_two_zones",
+      "mode": "safe_tick",
+      "exit": 1,
+      "metrics": {},
+      "error": "std::bad_alloc\n",
+      "wall_seconds": 31.181383284012554
+    },
+    {
+      "scenario": "05_twenty_robots_320_sites_480_tasks_ten_zones",
+      "mode": "original",
+      "exit": "timeout",
+      "wall_seconds": 40.12017278300482
+    },
+    {
+      "scenario": "05_twenty_robots_320_sites_480_tasks_ten_zones",
+      "mode": "safe_tick",
+      "exit": 1,
+      "metrics": {},
+      "error": "std::bad_alloc\n",
+      "wall_seconds": 32.98343918498722
+    }
+  ],
+  "export_audits": [
+    {
+      "config": "configs/sxbdz1/06_six_robots_160_sites_220_tasks_dispersed.yaml",
+      "passed": true,
+      "map_pixels": [
+        1564,
+        1472
+      ],
+      "map_resolution_m": 0.1,
+      "robots": 6,
+      "unique_sites": 160,
+      "tasks": 220,
+      "categories": 21,
+      "requirement_sizes": {
+        "1": 40,
+        "2": 78,
+        "3": 102
+      },
+      "high_priority_tasks": 80,
+      "merged_stops": 42,
+      "idle_robots": 0,
+      "coordination": {
+        "method": "prioritized",
+        "prioritized_succeeded": true,
+        "cbs_started": false,
+        "cbs_succeeded": false,
+        "total_wait_ticks": 4739,
+        "safe_interval_expanded_nodes": 22592,
+        "reservation_intervals": 95610,
+        "local_repair": {
+          "attempted": true,
+          "accepted": false,
+          "budget_exhausted": false,
+          "seconds": 0.119876204,
+          "expanded_nodes": 11567,
+          "makespan_before_ticks": 8498,
+          "makespan_after_ticks": 8498,
+          "robot_indices": [
+            5,
+            0,
+            2
+          ]
+        }
+      },
+      "checked_ticks": 8499,
+      "checked_robot_pairs": 15,
+      "baseline_unsafe_pair_ticks": 62,
+      "coordinated_unsafe_pair_ticks": 0,
+      "minimum_swept_separation_m": 0.715542,
+      "minimum_obstacle_clearance_m": 0.477501,
+      "makespan_seconds": 1699.6,
+      "total_wait_seconds": 947.8,
+      "per_robot": [
+        {
+          "robot": "fire-camera-gas-01",
+          "tasks": 38,
+          "stops": 28,
+          "finish_seconds": 1423.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "camera-thermal-delivery-02",
+          "tasks": 33,
+          "stops": 23,
+          "finish_seconds": 1430.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "fire-thermal-delivery-03",
+          "tasks": 39,
+          "stops": 29,
+          "finish_seconds": 1696.0,
+          "wait_seconds": 269.0,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "fire-delivery-gas-04",
+          "tasks": 36,
+          "stops": 26,
+          "finish_seconds": 1656.6,
+          "wait_seconds": 230.2,
+          "wait_events": 6,
+          "minimum_clearance_m": 0.477501
+        },
+        {
+          "robot": "camera-thermal-gas-05",
+          "tasks": 39,
+          "stops": 29,
+          "finish_seconds": 1603.2,
+          "wait_seconds": 184.2,
+          "wait_events": 15,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "camera-delivery-gas-06",
+          "tasks": 35,
+          "stops": 25,
+          "finish_seconds": 1699.6,
+          "wait_seconds": 264.4,
+          "wait_events": 6,
+          "minimum_clearance_m": 0.506288
+        }
+      ],
+      "gif": {
+        "pixels": [
+          1600,
+          1210
+        ],
+        "frames": 300,
+        "seconds": 29.37,
+        "bytes": 2352119,
+        "frames_with_wait_halo": 152
+      },
+      "runtime": {
+        "timing_allocation_seconds": 0.825049,
+        "timing_estimate_precompute_seconds": 0.73672,
+        "timing_final_path_seconds": 0.0465198,
+        "timing_coordination_seconds": 0.269442,
+        "peak_rss_mb": 137.191,
+        "timing_load_and_parse_seconds": 0.0150113,
+        "timing_planning_seconds": 1.14444,
+        "timing_export_seconds": 3.77983,
+        "timing_total_seconds": 4.93928
+      }
+    },
+    {
+      "config": "configs/sxbdz1/07_twelve_robots_240_sites_360_tasks_dispersed.yaml",
+      "passed": true,
+      "map_pixels": [
+        1564,
+        1472
+      ],
+      "map_resolution_m": 0.1,
+      "robots": 12,
+      "unique_sites": 240,
+      "tasks": 360,
+      "categories": 21,
+      "requirement_sizes": {
+        "1": 60,
+        "2": 114,
+        "3": 186
+      },
+      "high_priority_tasks": 128,
+      "merged_stops": 66,
+      "idle_robots": 0,
+      "coordination": {
+        "method": "prioritized",
+        "prioritized_succeeded": true,
+        "cbs_started": false,
+        "cbs_succeeded": false,
+        "total_wait_ticks": 9631,
+        "safe_interval_expanded_nodes": 36427,
+        "reservation_intervals": 263272,
+        "local_repair": {
+          "attempted": true,
+          "accepted": true,
+          "budget_exhausted": false,
+          "seconds": 0.137447455,
+          "expanded_nodes": 11839,
+          "makespan_before_ticks": 8401,
+          "makespan_after_ticks": 7427,
+          "robot_indices": [
+            10,
+            4,
+            9
+          ]
+        }
+      },
+      "checked_ticks": 7428,
+      "checked_robot_pairs": 66,
+      "baseline_unsafe_pair_ticks": 360,
+      "coordinated_unsafe_pair_ticks": 0,
+      "minimum_swept_separation_m": 0.715542,
+      "minimum_obstacle_clearance_m": 0.477501,
+      "makespan_seconds": 1485.4,
+      "total_wait_seconds": 1926.2,
+      "per_robot": [
+        {
+          "robot": "fire-camera-gas-01",
+          "tasks": 23,
+          "stops": 20,
+          "finish_seconds": 686.0,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.61443
+        },
+        {
+          "robot": "camera-thermal-delivery-02",
+          "tasks": 28,
+          "stops": 15,
+          "finish_seconds": 1085.0,
+          "wait_seconds": 12.6,
+          "wait_events": 2,
+          "minimum_clearance_m": 0.560359
+        },
+        {
+          "robot": "fire-thermal-delivery-03",
+          "tasks": 37,
+          "stops": 25,
+          "finish_seconds": 1119.4,
+          "wait_seconds": 61.0,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "fire-delivery-gas-04",
+          "tasks": 18,
+          "stops": 12,
+          "finish_seconds": 1287.8,
+          "wait_seconds": 266.6,
+          "wait_events": 5,
+          "minimum_clearance_m": 0.560359
+        },
+        {
+          "robot": "camera-thermal-gas-05",
+          "tasks": 33,
+          "stops": 20,
+          "finish_seconds": 1420.0,
+          "wait_seconds": 346.6,
+          "wait_events": 2,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "camera-delivery-gas-06",
+          "tasks": 13,
+          "stops": 13,
+          "finish_seconds": 437.4,
+          "wait_seconds": 43.6,
+          "wait_events": 5,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "fire-camera-gas-07",
+          "tasks": 45,
+          "stops": 28,
+          "finish_seconds": 1067.4,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "camera-thermal-delivery-08",
+          "tasks": 33,
+          "stops": 29,
+          "finish_seconds": 1118.6,
+          "wait_seconds": 49.6,
+          "wait_events": 5,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "fire-thermal-delivery-09",
+          "tasks": 33,
+          "stops": 25,
+          "finish_seconds": 1348.2,
+          "wait_seconds": 287.8,
+          "wait_events": 10,
+          "minimum_clearance_m": 0.547717
+        },
+        {
+          "robot": "fire-delivery-gas-10",
+          "tasks": 28,
+          "stops": 16,
+          "finish_seconds": 1138.6,
+          "wait_seconds": 93.0,
+          "wait_events": 7,
+          "minimum_clearance_m": 0.547717
+        },
+        {
+          "robot": "camera-thermal-gas-11",
+          "tasks": 29,
+          "stops": 23,
+          "finish_seconds": 1485.4,
+          "wait_seconds": 417.0,
+          "wait_events": 6,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "camera-delivery-gas-12",
+          "tasks": 40,
+          "stops": 20,
+          "finish_seconds": 1418.2,
+          "wait_seconds": 348.4,
+          "wait_events": 8,
+          "minimum_clearance_m": 0.506288
+        }
+      ],
+      "gif": {
+        "pixels": [
+          1600,
+          1255
+        ],
+        "frames": 300,
+        "seconds": 25.96,
+        "bytes": 3084797,
+        "frames_with_wait_halo": 203
+      },
+      "runtime": {
+        "timing_allocation_seconds": 1.55553,
+        "timing_estimate_precompute_seconds": 1.19898,
+        "timing_final_path_seconds": 0.0707374,
+        "timing_coordination_seconds": 0.41458,
+        "peak_rss_mb": 158.781,
+        "timing_load_and_parse_seconds": 0.0225539,
+        "timing_planning_seconds": 2.04491,
+        "timing_export_seconds": 4.10735,
+        "timing_total_seconds": 6.17481
+      }
+    },
+    {
+      "config": "configs/sxbdz1/08_twelve_robots_240_sites_360_tasks_two_zones_dispersed.yaml",
+      "passed": true,
+      "map_pixels": [
+        1564,
+        1472
+      ],
+      "map_resolution_m": 0.1,
+      "robots": 12,
+      "unique_sites": 240,
+      "tasks": 360,
+      "categories": 21,
+      "requirement_sizes": {
+        "2": 62,
+        "3": 112,
+        "4": 186
+      },
+      "high_priority_tasks": 127,
+      "merged_stops": 66,
+      "idle_robots": 0,
+      "coordination": {
+        "method": "prioritized",
+        "prioritized_succeeded": true,
+        "cbs_started": false,
+        "cbs_succeeded": false,
+        "total_wait_ticks": 4402,
+        "safe_interval_expanded_nodes": 32241,
+        "reservation_intervals": 356264,
+        "local_repair": {
+          "attempted": true,
+          "accepted": false,
+          "budget_exhausted": false,
+          "seconds": 0.088829537,
+          "expanded_nodes": 8367,
+          "makespan_before_ticks": 9077,
+          "makespan_after_ticks": 9077,
+          "robot_indices": [
+            2,
+            1
+          ]
+        }
+      },
+      "checked_ticks": 9078,
+      "checked_robot_pairs": 66,
+      "baseline_unsafe_pair_ticks": 202,
+      "coordinated_unsafe_pair_ticks": 0,
+      "minimum_swept_separation_m": 0.715542,
+      "minimum_obstacle_clearance_m": 0.464859,
+      "makespan_seconds": 1815.4,
+      "total_wait_seconds": 880.4,
+      "per_robot": [
+        {
+          "robot": "zone_01-fire-camera-gas-01",
+          "tasks": 45,
+          "stops": 29,
+          "finish_seconds": 1513.2,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-camera-thermal-delivery-02",
+          "tasks": 40,
+          "stops": 24,
+          "finish_seconds": 1517.8,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-fire-thermal-delivery-03",
+          "tasks": 48,
+          "stops": 32,
+          "finish_seconds": 1815.4,
+          "wait_seconds": 304.0,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-fire-delivery-gas-04",
+          "tasks": 41,
+          "stops": 25,
+          "finish_seconds": 1700.4,
+          "wait_seconds": 243.6,
+          "wait_events": 3,
+          "minimum_clearance_m": 0.477501
+        },
+        {
+          "robot": "zone_01-camera-thermal-gas-05",
+          "tasks": 48,
+          "stops": 32,
+          "finish_seconds": 1518.8,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-camera-delivery-gas-06",
+          "tasks": 44,
+          "stops": 28,
+          "finish_seconds": 1610.2,
+          "wait_seconds": 92.8,
+          "wait_events": 3,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_02-fire-camera-gas-01",
+          "tasks": 17,
+          "stops": 13,
+          "finish_seconds": 466.0,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_02-camera-thermal-delivery-02",
+          "tasks": 16,
+          "stops": 12,
+          "finish_seconds": 407.4,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.477501
+        },
+        {
+          "robot": "zone_02-fire-thermal-delivery-03",
+          "tasks": 19,
+          "stops": 15,
+          "finish_seconds": 604.4,
+          "wait_seconds": 1.0,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.464859
+        },
+        {
+          "robot": "zone_02-fire-delivery-gas-04",
+          "tasks": 10,
+          "stops": 6,
+          "finish_seconds": 383.6,
+          "wait_seconds": 96.4,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.51893
+        },
+        {
+          "robot": "zone_02-camera-thermal-gas-05",
+          "tasks": 19,
+          "stops": 15,
+          "finish_seconds": 435.6,
+          "wait_seconds": 1.4,
+          "wait_events": 3,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "zone_02-camera-delivery-gas-06",
+          "tasks": 13,
+          "stops": 9,
+          "finish_seconds": 527.0,
+          "wait_seconds": 141.2,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.464859
+        }
+      ],
+      "gif": {
+        "pixels": [
+          1600,
+          1255
+        ],
+        "frames": 300,
+        "seconds": 30.29,
+        "bytes": 2793751,
+        "frames_with_wait_halo": 131
+      },
+      "runtime": {
+        "timing_allocation_seconds": 1.32626,
+        "timing_estimate_precompute_seconds": 0.95299,
+        "timing_final_path_seconds": 0.069632,
+        "timing_coordination_seconds": 0.314822,
+        "peak_rss_mb": 143.516,
+        "timing_load_and_parse_seconds": 0.0216538,
+        "timing_planning_seconds": 1.71528,
+        "timing_export_seconds": 4.12475,
+        "timing_total_seconds": 5.86168
+      }
+    },
+    {
+      "config": "configs/sxbdz1/09_twenty_robots_320_sites_480_tasks_ten_zones_dispersed.yaml",
+      "passed": true,
+      "map_pixels": [
+        1564,
+        1472
+      ],
+      "map_resolution_m": 0.1,
+      "robots": 20,
+      "unique_sites": 320,
+      "tasks": 480,
+      "categories": 21,
+      "requirement_sizes": {
+        "2": 102,
+        "3": 152,
+        "4": 226
+      },
+      "high_priority_tasks": 170,
+      "merged_stops": 66,
+      "idle_robots": 0,
+      "coordination": {
+        "method": "prioritized",
+        "prioritized_succeeded": true,
+        "cbs_started": false,
+        "cbs_succeeded": false,
+        "total_wait_ticks": 9033,
+        "safe_interval_expanded_nodes": 40454,
+        "reservation_intervals": 745020,
+        "local_repair": {
+          "attempted": true,
+          "accepted": false,
+          "budget_exhausted": false,
+          "seconds": 0.11380304,
+          "expanded_nodes": 14085,
+          "makespan_before_ticks": 11026,
+          "makespan_after_ticks": 11026,
+          "robot_indices": [
+            3,
+            0,
+            1
+          ]
+        }
+      },
+      "checked_ticks": 11027,
+      "checked_robot_pairs": 190,
+      "baseline_unsafe_pair_ticks": 264,
+      "coordinated_unsafe_pair_ticks": 0,
+      "minimum_swept_separation_m": 0.715542,
+      "minimum_obstacle_clearance_m": 0.464859,
+      "makespan_seconds": 2205.2,
+      "total_wait_seconds": 1806.6,
+      "per_robot": [
+        {
+          "robot": "zone_01-fire-camera-gas-01",
+          "tasks": 50,
+          "stops": 29,
+          "finish_seconds": 1537.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-camera-thermal-delivery-02",
+          "tasks": 49,
+          "stops": 28,
+          "finish_seconds": 1538.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-fire-thermal-delivery-03",
+          "tasks": 51,
+          "stops": 30,
+          "finish_seconds": 1768.6,
+          "wait_seconds": 232.4,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-fire-delivery-gas-04",
+          "tasks": 47,
+          "stops": 26,
+          "finish_seconds": 2205.2,
+          "wait_seconds": 713.6,
+          "wait_events": 5,
+          "minimum_clearance_m": 0.51893
+        },
+        {
+          "robot": "zone_01-camera-thermal-gas-05",
+          "tasks": 50,
+          "stops": 30,
+          "finish_seconds": 1545.4,
+          "wait_seconds": 7.6,
+          "wait_events": 2,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_01-camera-delivery-gas-06",
+          "tasks": 47,
+          "stops": 27,
+          "finish_seconds": 1736.8,
+          "wait_seconds": 265.8,
+          "wait_events": 10,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_02-fire-camera-gas-01",
+          "tasks": 19,
+          "stops": 13,
+          "finish_seconds": 481.0,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.506288
+        },
+        {
+          "robot": "zone_02-camera-thermal-delivery-02",
+          "tasks": 18,
+          "stops": 12,
+          "finish_seconds": 421.4,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.477501
+        },
+        {
+          "robot": "zone_02-fire-thermal-delivery-03",
+          "tasks": 21,
+          "stops": 15,
+          "finish_seconds": 620.4,
+          "wait_seconds": 4.0,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.464859
+        },
+        {
+          "robot": "zone_02-fire-delivery-gas-04",
+          "tasks": 12,
+          "stops": 6,
+          "finish_seconds": 398.6,
+          "wait_seconds": 88.4,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.51893
+        },
+        {
+          "robot": "zone_02-camera-thermal-gas-05",
+          "tasks": 21,
+          "stops": 15,
+          "finish_seconds": 445.2,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "zone_02-camera-delivery-gas-06",
+          "tasks": 15,
+          "stops": 9,
+          "finish_seconds": 618.6,
+          "wait_seconds": 211.8,
+          "wait_events": 2,
+          "minimum_clearance_m": 0.464859
+        },
+        {
+          "robot": "zone_03-generalist-01",
+          "tasks": 15,
+          "stops": 15,
+          "finish_seconds": 302.2,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.51893
+        },
+        {
+          "robot": "zone_04-generalist-01",
+          "tasks": 12,
+          "stops": 12,
+          "finish_seconds": 248.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "zone_05-generalist-01",
+          "tasks": 12,
+          "stops": 12,
+          "finish_seconds": 244.8,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "zone_06-generalist-01",
+          "tasks": 10,
+          "stops": 10,
+          "finish_seconds": 224.2,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.573001
+        },
+        {
+          "robot": "zone_07-generalist-01",
+          "tasks": 10,
+          "stops": 10,
+          "finish_seconds": 173.4,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.61443
+        },
+        {
+          "robot": "zone_08-generalist-01",
+          "tasks": 8,
+          "stops": 8,
+          "finish_seconds": 186.4,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.477501
+        },
+        {
+          "robot": "zone_09-generalist-01",
+          "tasks": 7,
+          "stops": 7,
+          "finish_seconds": 385.4,
+          "wait_seconds": 283.0,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.655859
+        },
+        {
+          "robot": "zone_10-generalist-01",
+          "tasks": 6,
+          "stops": 6,
+          "finish_seconds": 103.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.547717
+        }
+      ],
+      "gif": {
+        "pixels": [
+          1600,
+          1975
+        ],
+        "frames": 300,
+        "seconds": 30.81,
+        "bytes": 3398811,
+        "frames_with_wait_halo": 147
+      },
+      "runtime": {
+        "timing_allocation_seconds": 2.57127,
+        "timing_estimate_precompute_seconds": 1.15171,
+        "timing_final_path_seconds": 0.0913829,
+        "timing_coordination_seconds": 0.418762,
+        "peak_rss_mb": 166.316,
+        "timing_load_and_parse_seconds": 0.0283954,
+        "timing_planning_seconds": 3.08683,
+        "timing_export_seconds": 6.36505,
+        "timing_total_seconds": 9.48028
+      }
+    },
+    {
+      "config": "configs/bdz1/04_five_robot_types_50_points.yaml",
+      "passed": true,
+      "map_pixels": [
+        2365,
+        1152
+      ],
+      "map_resolution_m": 0.1,
+      "robots": 5,
+      "unique_sites": 50,
+      "tasks": 50,
+      "categories": 20,
+      "requirement_sizes": {
+        "1": 17,
+        "2": 33
+      },
+      "high_priority_tasks": 4,
+      "merged_stops": 0,
+      "idle_robots": 0,
+      "coordination": {
+        "method": "prioritized",
+        "prioritized_succeeded": true,
+        "cbs_started": false,
+        "cbs_succeeded": false,
+        "total_wait_ticks": 12,
+        "safe_interval_expanded_nodes": 10278,
+        "reservation_intervals": 62744,
+        "local_repair": {
+          "attempted": false,
+          "accepted": false,
+          "budget_exhausted": false,
+          "seconds": 0,
+          "expanded_nodes": 0,
+          "makespan_before_ticks": 0,
+          "makespan_after_ticks": 0,
+          "robot_indices": []
+        }
+      },
+      "checked_ticks": 10048,
+      "checked_robot_pairs": 10,
+      "baseline_unsafe_pair_ticks": 58,
+      "coordinated_unsafe_pair_ticks": 0,
+      "minimum_swept_separation_m": 0.282843,
+      "minimum_obstacle_clearance_m": 0.191,
+      "makespan_seconds": 1004.7,
+      "total_wait_seconds": 1.2,
+      "per_robot": [
+        {
+          "robot": "fire-camera-gas",
+          "tasks": 12,
+          "stops": 12,
+          "finish_seconds": 891.7,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.382001
+        },
+        {
+          "robot": "camera-thermal-delivery",
+          "tasks": 13,
+          "stops": 13,
+          "finish_seconds": 859.1,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "fire-thermal-delivery",
+          "tasks": 12,
+          "stops": 12,
+          "finish_seconds": 1004.7,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "fire-delivery-gas",
+          "tasks": 7,
+          "stops": 7,
+          "finish_seconds": 697.3,
+          "wait_seconds": 1.2,
+          "wait_events": 2,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "camera-thermal-gas",
+          "tasks": 6,
+          "stops": 6,
+          "finish_seconds": 737.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        }
+      ],
+      "gif": {
+        "pixels": [
+          1280,
+          625
+        ],
+        "frames": 171,
+        "seconds": 17.75,
+        "bytes": 847736,
+        "frames_with_wait_halo": 2
+      },
+      "runtime": {
+        "timing_allocation_seconds": 0.350974,
+        "timing_estimate_precompute_seconds": 0.335301,
+        "timing_final_path_seconds": 0.0350621,
+        "timing_coordination_seconds": 0.0565009,
+        "peak_rss_mb": 109.055,
+        "timing_load_and_parse_seconds": 0.0089439,
+        "timing_planning_seconds": 0.444304,
+        "timing_export_seconds": 1.04067,
+        "timing_total_seconds": 1.49392
+      }
+    },
+    {
+      "config": "configs/bdz1/05_five_robot_types_60_points.yaml",
+      "passed": true,
+      "map_pixels": [
+        2365,
+        1152
+      ],
+      "map_resolution_m": 0.1,
+      "robots": 5,
+      "unique_sites": 50,
+      "tasks": 60,
+      "categories": 20,
+      "requirement_sizes": {
+        "1": 22,
+        "2": 38
+      },
+      "high_priority_tasks": 4,
+      "merged_stops": 6,
+      "idle_robots": 0,
+      "coordination": {
+        "method": "prioritized",
+        "prioritized_succeeded": true,
+        "cbs_started": false,
+        "cbs_succeeded": false,
+        "total_wait_ticks": 1007,
+        "safe_interval_expanded_nodes": 11255,
+        "reservation_intervals": 65948,
+        "local_repair": {
+          "attempted": true,
+          "accepted": false,
+          "budget_exhausted": false,
+          "seconds": 0.031074396,
+          "expanded_nodes": 5012,
+          "makespan_before_ticks": 10080,
+          "makespan_after_ticks": 10080,
+          "robot_indices": [
+            3,
+            1
+          ]
+        }
+      },
+      "checked_ticks": 10081,
+      "checked_robot_pairs": 10,
+      "baseline_unsafe_pair_ticks": 3,
+      "coordinated_unsafe_pair_ticks": 0,
+      "minimum_swept_separation_m": 0.178885,
+      "minimum_obstacle_clearance_m": 0.191,
+      "makespan_seconds": 1008.0,
+      "total_wait_seconds": 100.7,
+      "per_robot": [
+        {
+          "robot": "fire-camera-gas",
+          "tasks": 15,
+          "stops": 14,
+          "finish_seconds": 903.1,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.382001
+        },
+        {
+          "robot": "camera-thermal-delivery",
+          "tasks": 12,
+          "stops": 11,
+          "finish_seconds": 967.2,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "fire-thermal-delivery",
+          "tasks": 14,
+          "stops": 12,
+          "finish_seconds": 969.2,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "fire-delivery-gas",
+          "tasks": 15,
+          "stops": 13,
+          "finish_seconds": 1008.0,
+          "wait_seconds": 100.7,
+          "wait_events": 1,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "camera-thermal-gas",
+          "tasks": 4,
+          "stops": 4,
+          "finish_seconds": 361.5,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        }
+      ],
+      "gif": {
+        "pixels": [
+          1280,
+          625
+        ],
+        "frames": 170,
+        "seconds": 17.8,
+        "bytes": 864161,
+        "frames_with_wait_halo": 18
+      },
+      "runtime": {
+        "timing_allocation_seconds": 0.320453,
+        "timing_estimate_precompute_seconds": 0.314569,
+        "timing_final_path_seconds": 0.0297341,
+        "timing_coordination_seconds": 0.0861137,
+        "peak_rss_mb": 110.352,
+        "timing_load_and_parse_seconds": 0.00992819,
+        "timing_planning_seconds": 0.437842,
+        "timing_export_seconds": 1.02451,
+        "timing_total_seconds": 1.47229
+      }
+    },
+    {
+      "config": "configs/bdz1/06_five_robot_types_80_points.yaml",
+      "passed": true,
+      "map_pixels": [
+        2365,
+        1152
+      ],
+      "map_resolution_m": 0.1,
+      "robots": 5,
+      "unique_sites": 52,
+      "tasks": 80,
+      "categories": 20,
+      "requirement_sizes": {
+        "1": 32,
+        "2": 48
+      },
+      "high_priority_tasks": 4,
+      "merged_stops": 14,
+      "idle_robots": 0,
+      "coordination": {
+        "method": "prioritized",
+        "prioritized_succeeded": true,
+        "cbs_started": false,
+        "cbs_succeeded": false,
+        "total_wait_ticks": 0,
+        "safe_interval_expanded_nodes": 11649,
+        "reservation_intervals": 63288,
+        "local_repair": {
+          "attempted": false,
+          "accepted": false,
+          "budget_exhausted": false,
+          "seconds": 0,
+          "expanded_nodes": 0,
+          "makespan_before_ticks": 0,
+          "makespan_after_ticks": 0,
+          "robot_indices": []
+        }
+      },
+      "checked_ticks": 10248,
+      "checked_robot_pairs": 10,
+      "baseline_unsafe_pair_ticks": 0,
+      "coordinated_unsafe_pair_ticks": 0,
+      "minimum_swept_separation_m": 0.3,
+      "minimum_obstacle_clearance_m": 0.191,
+      "makespan_seconds": 1024.7,
+      "total_wait_seconds": 0.0,
+      "per_robot": [
+        {
+          "robot": "fire-camera-gas",
+          "tasks": 22,
+          "stops": 16,
+          "finish_seconds": 973.2,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.382001
+        },
+        {
+          "robot": "camera-thermal-delivery",
+          "tasks": 12,
+          "stops": 11,
+          "finish_seconds": 776.6,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "fire-thermal-delivery",
+          "tasks": 23,
+          "stops": 20,
+          "finish_seconds": 1024.7,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        },
+        {
+          "robot": "fire-delivery-gas",
+          "tasks": 13,
+          "stops": 12,
+          "finish_seconds": 1021.4,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.369359
+        },
+        {
+          "robot": "camera-thermal-gas",
+          "tasks": 10,
+          "stops": 7,
+          "finish_seconds": 394.1,
+          "wait_seconds": 0.0,
+          "wait_events": 0,
+          "minimum_clearance_m": 0.23243
+        }
+      ],
+      "gif": {
+        "pixels": [
+          1280,
+          625
+        ],
+        "frames": 172,
+        "seconds": 18.08,
+        "bytes": 873587,
+        "frames_with_wait_halo": 0
+      },
+      "runtime": {
+        "timing_allocation_seconds": 0.349984,
+        "timing_estimate_precompute_seconds": 0.33917,
+        "timing_final_path_seconds": 0.0357685,
+        "timing_coordination_seconds": 0.0512654,
+        "peak_rss_mb": 110.223,
+        "timing_load_and_parse_seconds": 0.00977661,
+        "timing_planning_seconds": 0.43852,
+        "timing_export_seconds": 1.05764,
+        "timing_total_seconds": 1.50593
+      }
+    }
+  ],
+  "original_06_swept_collision": {
+    "robots": [
+      "camera-thermal-gas-05",
+      "camera-delivery-gas-06"
+    ],
+    "departure_tick": 7690,
+    "departure_seconds": 1538.0,
+    "fraction_within_tick": 0.5,
+    "minimum_distance_m": 0.5656854249492423,
+    "required_minimum_m": 0.6,
+    "resources": [
+      "edge:map_000:1430:190:1434:194",
+      "edge:map_000:1426:194:1430:198"
+    ]
+  }
+}

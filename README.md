@@ -99,11 +99,17 @@ For example, add `animation: true`, `animation_fps: 10`,
 When enabled, `plan.json` also includes every robot's `timed_schedule` in grid
 coordinates. The `coordination.method` field and GIF header report `prioritized`,
 `cbs`, or `none`; the offline adapter tries prioritized scheduling before CBS.
+Prioritized scheduling uses compressed reservations and safe time intervals.
+One optional local repair reschedules at most three robots, with a shared 0.2 s /
+20,000 node budget. It accepts only safe schedules with a shorter makespan and
+no increase in summed completion times; `coordination.local_repair` records the
+outcome. See [validation results](docs/coordination_optimization_validation_zh.md).
 
 Cross-map routing uses A* inside each occupancy grid and Dijkstra over the
 sparse transition topology. Task allocation minimizes weighted maximum robot
-load plus total load. CBS then schedules progress and waits along the selected
-routes, resolving same-cell, opposing-edge, and shared-transition conflicts.
+load plus total load. Time coordination schedules progress and waits along the
+selected routes, resolving footprint, swept-motion, and shared-resource conflicts;
+CBS is the fallback when prioritized scheduling fails.
 
 The offline planner uses a Nav2-inspired clearance cost field and optional
 robot-specific `clearance_radius_m`, `safety_margin_m`, and

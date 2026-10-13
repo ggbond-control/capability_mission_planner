@@ -36,6 +36,8 @@ if(BUILD_OFFLINE_MAP_ADAPTER)
     src/offline_map_planner/offline_mission_planner.cpp
     src/offline_map_planner/offline_planner_config.cpp
     src/offline_map_planner/multi_map_coordinator.cpp
+    src/offline_map_planner/route_reservations.cpp
+    src/offline_map_planner/safe_interval_scheduler.cpp
     src/offline_map_planner/plan_exporter.cpp
     src/offline_map_planner/plan_animation.cpp
     src/offline_map_planner/live_reservation.cpp)
@@ -107,6 +109,11 @@ if(BUILD_TESTING)
       ${CMAKE_CURRENT_BINARY_DIR}/capability_mission_plan.png)
   endif()
   if(TARGET capability_mission_planner_map_adapter)
+    add_executable(coordination_tests test/coordination_tests.cpp)
+    target_link_libraries(coordination_tests PRIVATE capability_mission_planner_map_adapter)
+    add_test(NAME coordination_tests COMMAND coordination_tests)
+    add_executable(coordination_benchmark test/coordination_benchmark.cpp)
+    target_link_libraries(coordination_benchmark PRIVATE capability_mission_planner_map_adapter)
     if(GIF_FOUND)
       add_executable(plan_animation_tests test/plan_animation_tests.cpp)
       target_include_directories(plan_animation_tests PRIVATE ${GIF_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})

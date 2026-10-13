@@ -195,6 +195,9 @@ planner:
     downsample_costmap: false
     coarse_search_factor: 1
     resource_buffer_seconds: 0.5
+    coordination_local_repair: true
+    coordination_repair_budget_seconds: 0.2
+    coordination_repair_max_expanded_nodes: 20000
     default_transition_seconds: 5.0
     map_switch_seconds: 2.0
     transition_seconds:
@@ -207,6 +210,13 @@ planner:
 
 - `coordinate_conflicts`：启用时间协调，先尝试优先级调度，失败后使用 CBS；关闭时仍分配和规划路径，但不消解
   机器人之间的时空冲突。
+- 优先级调度使用预约区间和安全时间区间搜索，跳过整段被占用的时间，保留全部路径、服务和过渡帧。
+- `coordination_local_repair`：默认开启。优先级调度成功后，如果最后完工机器人的等待至少为
+  2 个时间步且达到其必需路线长度约 5%，尝试一次最多 3 台机器人的重排。
+  只接受安全、总完工时间缩短且完工时间之和不增加的结果；其他情况保留原时间表。
+- `coordination_repair_budget_seconds`、`coordination_repair_max_expanded_nodes`：一次修复共享的
+  时间预算和展开节点上限，默认 0.2 秒 / 20000，必须为有限正值 / 正整数。
+  超时检查覆盖预约构建、搜索、轨迹重建与最终碰撞检查；属于协作式预算，不是实时系统的硬截止保证。
 - `maximum_load_weight`：最大单机负载权重，越大越倾向负载均衡。
 - `total_load_weight`：所有机器人总负载权重，越大越倾向减少总路程和总时间。
 - `time_step_seconds`：时间离散粒度。
@@ -305,6 +315,7 @@ routes_overall.gif  # 启用 export.animation 时
   启用动画时，额外包含 `timed_schedule`：每步的 `tick`、`map_id`、`grid`、
   `route_frame`、`transition_id` 和 `resource`。这些完整轨迹独立于检查点筛选；
   `coordination` 标明实际方法、CBS 是否启动/成功和协调等待时间步数。
+  `coordination.local_repair` 记录是否尝试、是否接受、是否耗尽预算、参与机器人索引和修复前后完工时间。
 - `summary.txt`：便于人工快速阅读的路线摘要。
 - `routes_<map_id>.png`：在每张原始栅格图上叠加机器人起点、任务编号、通道和
   规划路径。
