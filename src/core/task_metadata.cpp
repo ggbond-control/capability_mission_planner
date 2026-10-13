@@ -4,7 +4,7 @@
  * Adapted from rmf_task metadata types under the Apache License, Version 2.0.
  * See third_party/licenses/rmf_task-Apache-2.0.txt.
  */
-#include <capability_mission_planner/task_metadata.hpp>
+#include <capability_mission_planner/core/task_metadata.hpp>
 
 #include <utility>
 

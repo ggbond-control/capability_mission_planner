@@ -1,5 +1,5 @@
-#include <capability_mission_planner/offline_planner_config.hpp>
-#include "../src/offline_map_planner/multi_map_coordinator.hpp"
+#include <capability_mission_planner/offline/offline_planner_config.hpp>
+#include "../src/offline/coordination/multi_map_coordinator.hpp"
 
 #include <algorithm>
 #include <chrono>

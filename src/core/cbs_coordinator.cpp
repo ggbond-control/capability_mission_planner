@@ -1,4 +1,4 @@
-#include <capability_mission_planner/cbs_coordinator.hpp>
+#include <capability_mission_planner/core/cbs_coordinator.hpp>
 
 #include <capability_mission_planner/search/conflict_based_search.hpp>
 

@@ -1,4 +1,4 @@
-#include <capability_mission_planner/grid_path_planner.hpp>
+#include <capability_mission_planner/core/grid_path_planner.hpp>
 
 #include <capability_mission_planner/search/a_star.hpp>
 

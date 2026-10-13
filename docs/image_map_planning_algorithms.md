@@ -162,7 +162,7 @@ f(n) = g(n) + h(n)
 相关实现：
 
 - [`include/capability_mission_planner/search/a_star.hpp`](../include/capability_mission_planner/search/a_star.hpp)
-- [`src/grid_path_planner.cpp`](../src/grid_path_planner.cpp)
+- [`src/core/grid_path_planner.cpp`](../src/core/grid_path_planner.cpp)
 
 ## 7. 最便宜插入启发式
 
@@ -333,7 +333,7 @@ t+1 时刻：机器人 a 到达 Y，机器人 b 到达 X
 相关实现：
 
 - [`include/capability_mission_planner/search/conflict_based_search.hpp`](../include/capability_mission_planner/search/conflict_based_search.hpp)
-- [`src/cbs_coordinator.cpp`](../src/cbs_coordinator.cpp)
+- [`src/core/cbs_coordinator.cpp`](../src/core/cbs_coordinator.cpp)
 
 ## 12. 本次任务分配结果
 

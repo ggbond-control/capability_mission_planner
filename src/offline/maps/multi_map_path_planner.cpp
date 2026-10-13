@@ -1,4 +1,4 @@
-#include <capability_mission_planner/offline_map_planner.hpp>
+#include <capability_mission_planner/offline/offline_map_planner.hpp>
 
 #include <capability_mission_planner/search/a_star.hpp>
 

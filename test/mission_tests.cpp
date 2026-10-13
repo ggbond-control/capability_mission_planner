@@ -1,5 +1,5 @@
-#include <capability_mission_planner/cbs_coordinator.hpp>
-#include <capability_mission_planner/mission_planner.hpp>
+#include <capability_mission_planner/core/cbs_coordinator.hpp>
+#include <capability_mission_planner/core/mission_planner.hpp>
 
 #include <algorithm>
 #include <iostream>

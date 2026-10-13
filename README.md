@@ -18,6 +18,25 @@ The planner is self-contained. Adapted source is organized by function under
 retained under `third_party/licenses/`. No RMF workspace or separate planning
 project is required at configure, build, or runtime.
 
+Public headers are grouped under `include/capability_mission_planner/`:
+
+- `core/`: basic types, task metadata, grid planning, task allocation, and CBS coordination;
+- `offline/`: offline map planning, mission configuration, and execution reservations;
+- `search/`: reusable header-only search algorithms.
+
+Implementation files are grouped under `src/`:
+
+- `core/`: the basic planning library;
+- `offline/`: offline mission planning and configuration, with `maps/` for map loading
+  and routing, `coordination/` for scheduling and reservations, and `output/` for
+  JSON, text, image, and animation exports;
+- `ros/`: the ROS 2 node adapter.
+
+Internal helper headers remain alongside their implementations in `src/`.
+The original public headers at the include root forward to the module headers,
+so existing include paths remain supported. New code should use module paths,
+such as `<capability_mission_planner/core/mission_planner.hpp>`.
+
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel

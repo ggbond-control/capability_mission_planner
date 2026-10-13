@@ -1,5 +1,5 @@
-#include "../src/offline_map_planner/multi_map_coordinator.hpp"
-#include "../src/offline_map_planner/safe_interval_scheduler.hpp"
+#include "../src/offline/coordination/multi_map_coordinator.hpp"
+#include "../src/offline/coordination/safe_interval_scheduler.hpp"
 
 #include <algorithm>
 #include <cmath>

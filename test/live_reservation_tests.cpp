@@ -1,4 +1,4 @@
-#include <capability_mission_planner/live_reservation.hpp>
+#include <capability_mission_planner/offline/live_reservation.hpp>
 
 #include <iostream>
 #include <stdexcept>

@@ -1,5 +1,5 @@
-#include <capability_mission_planner/offline_map_planner.hpp>
-#include <capability_mission_planner/offline_planner_config.hpp>
+#include <capability_mission_planner/offline/offline_map_planner.hpp>
+#include <capability_mission_planner/offline/offline_planner_config.hpp>
 
 #include <rcl_interfaces/msg/parameter_type.hpp>
 #include <rcl_interfaces/srv/set_parameters.hpp>

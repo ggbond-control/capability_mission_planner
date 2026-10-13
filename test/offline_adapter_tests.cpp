@@ -1,5 +1,5 @@
-#include <capability_mission_planner/offline_map_planner.hpp>
-#include <capability_mission_planner/offline_planner_config.hpp>
+#include <capability_mission_planner/offline/offline_map_planner.hpp>
+#include <capability_mission_planner/offline/offline_planner_config.hpp>
 
 #include <algorithm>
 #include <array>

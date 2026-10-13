@@ -16,10 +16,10 @@ find_package(rclcpp REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 
 add_library(capability_mission_planner
-  src/grid_path_planner.cpp
-  src/mission_planner.cpp
-  src/cbs_coordinator.cpp
-  src/task_metadata.cpp)
+  src/core/grid_path_planner.cpp
+  src/core/mission_planner.cpp
+  src/core/cbs_coordinator.cpp
+  src/core/task_metadata.cpp)
 
 target_include_directories(capability_mission_planner
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
@@ -31,16 +31,16 @@ if(BUILD_OFFLINE_MAP_ADAPTER)
   find_package(yaml-cpp REQUIRED)
   find_package(GIF QUIET)
   add_library(capability_mission_planner_map_adapter
-    src/offline_map_planner/map_bundle_loader.cpp
-    src/offline_map_planner/multi_map_path_planner.cpp
-    src/offline_map_planner/offline_mission_planner.cpp
-    src/offline_map_planner/offline_planner_config.cpp
-    src/offline_map_planner/multi_map_coordinator.cpp
-    src/offline_map_planner/route_reservations.cpp
-    src/offline_map_planner/safe_interval_scheduler.cpp
-    src/offline_map_planner/plan_exporter.cpp
-    src/offline_map_planner/plan_animation.cpp
-    src/offline_map_planner/live_reservation.cpp)
+    src/offline/maps/map_bundle_loader.cpp
+    src/offline/maps/multi_map_path_planner.cpp
+    src/offline/offline_mission_planner.cpp
+    src/offline/offline_planner_config.cpp
+    src/offline/coordination/multi_map_coordinator.cpp
+    src/offline/coordination/route_reservations.cpp
+    src/offline/coordination/safe_interval_scheduler.cpp
+    src/offline/output/plan_exporter.cpp
+    src/offline/output/plan_animation.cpp
+    src/offline/coordination/live_reservation.cpp)
   target_include_directories(capability_mission_planner_map_adapter
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE ${OpenCV_INCLUDE_DIRS})

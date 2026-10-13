@@ -1,6 +1,6 @@
-#include <capability_mission_planner/offline_map_planner.hpp>
+#include <capability_mission_planner/offline/offline_map_planner.hpp>
 
-#include "multi_map_coordinator.hpp"
+#include "coordination/multi_map_coordinator.hpp"
 
 #include <algorithm>
 #include <chrono>

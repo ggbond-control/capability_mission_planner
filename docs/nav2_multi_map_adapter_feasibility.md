@@ -289,23 +289,24 @@ struct Location {
 
 ## 11. 建议的模块结构
 
-建议将适配实现组织为独立模块：
+离线适配实现已组织为独立模块，当前目录结构为：
 
 ```text
-src/offline_map_planner/
-  map_bundle_loader.cpp
-  coordinate_transform.cpp
-  multi_map_topology.cpp
-  multi_map_path_planner.cpp
-  mission_input_adapter.cpp
-  nav2_route_adapter.cpp
-  ros2_route_executor.cpp       # 可选 ROS2 目标
+src/offline/
+  offline_mission_planner.cpp
+  offline_planner_config.cpp
+  maps/                       # 地图读取、坐标转换、预处理、缓存与跨地图路径
+  coordination/               # 冲突协调、路线预约与执行阶段资源预约
+  output/                     # JSON、文本、PNG 与 GIF 导出
+
+src/ros/
+  mission_planner_node.cpp     # ROS2 接口适配
 ```
 
-必要的公开接口声明放在：
+公开接口声明放在：
 
 ```text
-include/capability_mission_planner/nav2_multi_map/
+include/capability_mission_planner/offline/
 ```
 
 实现归入 `src`，公开的数据类型和调用接口仍放在 `include`。仅把所有声明和实现

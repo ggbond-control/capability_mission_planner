@@ -1,4 +1,4 @@
-#include <capability_mission_planner/mission_planner.hpp>
+#include <capability_mission_planner/core/mission_planner.hpp>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>

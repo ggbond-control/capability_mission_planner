@@ -1,4 +1,4 @@
-#include <capability_mission_planner/offline_planner_config.hpp>
+#include <capability_mission_planner/offline/offline_planner_config.hpp>
 
 #include <yaml-cpp/yaml.h>
 

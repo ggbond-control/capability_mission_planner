@@ -1,4 +1,4 @@
-#include <capability_mission_planner/offline_map_planner.hpp>
+#include <capability_mission_planner/offline/offline_map_planner.hpp>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
