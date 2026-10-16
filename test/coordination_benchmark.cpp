@@ -31,7 +31,7 @@ int main(int argc, char **argv)
             else throw std::invalid_argument("unknown benchmark argument: " + arg);
         }
         MultiMapPathPlanner paths(request.bundle, request.traversal);
-        auto plan = OfflineMissionPlanner(paths, request.objective).plan(request.robots, request.tasks, false);
+        auto plan = OfflineMissionPlanner(paths, request.objective, request.allocation).plan(request.robots, request.tasks, false);
         // Vary coordination order without changing the allocation or routes.
         if (!request.robots.empty())
         {

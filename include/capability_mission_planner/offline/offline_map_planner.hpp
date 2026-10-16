@@ -377,6 +377,29 @@ namespace capability_mission_planner::offline
         std::string checkpoint_id;
     };
 
+    struct AllocationOptions
+    {
+        std::size_t max_passes = 8U;
+        std::size_t max_candidate_evaluations = 50000U;
+        double budget_seconds = 1.0;
+        bool balance_task_counts = true;
+        // Count balancing may increase both maximum and total estimated load by
+        // at most this fraction relative to the time-optimized allocation.
+        double balance_load_slack = 0.10;
+    };
+
+    struct AllocationStats
+    {
+        std::size_t candidate_evaluations = 0;
+        std::size_t relocation_moves = 0;
+        std::size_t balancing_moves = 0;
+        bool budget_exhausted = false;
+        bool balance_reverted = false;
+        double local_search_seconds = 0.0;
+        std::vector<std::size_t> initial_task_counts;
+        std::vector<std::size_t> final_task_counts;
+    };
+
     struct OfflineMissionPlan
     {
         std::vector<MappedRobotRoute> routes;
@@ -394,6 +417,7 @@ namespace capability_mission_planner::offline
         double final_path_seconds = 0.0;
         double coordination_seconds = 0.0;
         CoordinationStats coordination_stats;
+        AllocationStats allocation_stats;
     };
 
     class OfflineMissionPlanner
@@ -401,7 +425,8 @@ namespace capability_mission_planner::offline
     public:
         OfflineMissionPlanner(
             MultiMapPathPlanner path_planner,
-            ObjectiveWeights weights = {});
+            ObjectiveWeights weights = {},
+            AllocationOptions allocation = {});
 
         OfflineMissionPlan plan(
             const std::vector<MappedRobot> &robots,
@@ -411,6 +436,7 @@ namespace capability_mission_planner::offline
     private:
         MultiMapPathPlanner _path_planner;
         ObjectiveWeights _weights;
+        AllocationOptions _allocation;
     };
 
     struct ExportOptions

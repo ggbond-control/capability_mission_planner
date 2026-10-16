@@ -241,6 +241,25 @@ namespace capability_mission_planner::offline
         if (planner)
             require_map(planner, "planner");
         load_traversal(planner ? planner["traversal"] : YAML::Node{}, result.traversal);
+        if (planner && planner["allocation"])
+        {
+            const auto allocation = planner["allocation"];
+            require_map(allocation, "planner.allocation");
+            if (allocation["max_passes"])
+                result.allocation.max_passes = allocation["max_passes"].as<std::size_t>();
+            if (allocation["max_candidate_evaluations"])
+                result.allocation.max_candidate_evaluations = allocation["max_candidate_evaluations"].as<std::size_t>();
+            if (allocation["budget_seconds"])
+                result.allocation.budget_seconds = allocation["budget_seconds"].as<double>();
+            if (allocation["balance_task_counts"])
+                result.allocation.balance_task_counts = allocation["balance_task_counts"].as<bool>();
+            if (allocation["balance_load_slack"])
+                result.allocation.balance_load_slack = allocation["balance_load_slack"].as<double>();
+            if (!std::isfinite(result.allocation.budget_seconds) || result.allocation.budget_seconds <= 0.0 ||
+                result.allocation.max_candidate_evaluations == 0U ||
+                !std::isfinite(result.allocation.balance_load_slack) || result.allocation.balance_load_slack < 0.0)
+                throw std::runtime_error("invalid planner.allocation budget or load slack");
+        }
         if (planner && planner["shared_resources"])
         {
             if (!planner["shared_resources"].IsSequence())

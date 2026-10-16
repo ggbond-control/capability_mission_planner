@@ -130,6 +130,16 @@ load plus total load. Time coordination schedules progress and waits along the
 selected routes, resolving footprint, swept-motion, and shared-resource conflicts;
 CBS is the fallback when prioritized scheduling fails.
 
+Allocation relocation now runs for missions above 20 tasks as well, with a
+shared 1-second / 50,000-candidate budget and up to 8 accepted moves per phase.
+After optimizing weighted route time, it reduces task-count imbalance subject
+to a 10% bound on both maximum and total route load relative to that optimized
+allocation. Capabilities remain mandatory; equal task counts are not guaranteed.
+`planner.allocation` can adjust these bounds or disable count balancing. The
+bound is checked again against final paths, before time coordination. Budget
+exhaustion retains a complete allocation; `plan.json.allocation` records the
+outcome. See [allocation parameters](docs/offline_planner_usage_zh.md#7-算法参数).
+
 The offline planner uses a Nav2-inspired clearance cost field and optional
 robot-specific `clearance_radius_m`, `safety_margin_m`, and
 `nominal_speed_mps`. It emits task-level stops with position tolerances for

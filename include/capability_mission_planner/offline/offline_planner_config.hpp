@@ -19,6 +19,7 @@ namespace capability_mission_planner::offline
         std::filesystem::path output_directory;
         TraversalOptions traversal;
         ObjectiveWeights objective;
+        AllocationOptions allocation;
         ExportOptions export_options;
         bool coordinate_conflicts = true;
         std::vector<MappedRobot> robots;

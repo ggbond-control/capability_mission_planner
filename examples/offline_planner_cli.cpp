@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
             request.output_directory = std::filesystem::absolute(argv[2]);
 
         MultiMapPathPlanner path_planner(request.bundle, request.traversal);
-        OfflineMissionPlanner planner(std::move(path_planner), request.objective);
+        OfflineMissionPlanner planner(std::move(path_planner), request.objective, request.allocation);
         const auto plan = planner.plan(request.robots, request.tasks, request.coordinate_conflicts);
         const auto planned_at = std::chrono::steady_clock::now();
         PlanExporter::write(request.output_directory, *request.bundle, request.robots, request.tasks, plan, request.export_options);
@@ -48,6 +48,12 @@ int main(int argc, char *argv[])
                   << request.bundle->map_preprocess_seconds << '\n'
                   << "  robots: " << request.robots.size() << '\n'
                   << "  tasks: " << request.tasks.size() << '\n'
+                  << "  allocation_candidate_evaluations: " << plan.allocation_stats.candidate_evaluations << '\n'
+                  << "  allocation_relocation_moves: " << plan.allocation_stats.relocation_moves << '\n'
+                  << "  allocation_balancing_moves: " << plan.allocation_stats.balancing_moves << '\n'
+                  << "  allocation_budget_exhausted: " << (plan.allocation_stats.budget_exhausted ? "true" : "false") << '\n'
+                  << "  allocation_balance_reverted: " << (plan.allocation_stats.balance_reverted ? "true" : "false") << '\n'
+                  << "  timing_allocation_local_search_seconds: " << plan.allocation_stats.local_search_seconds << '\n'
                   << "  maximum_load_seconds: "
                   << plan.maximum_load_ticks * plan.time_step_seconds << '\n'
                   << "  total_load_seconds: "

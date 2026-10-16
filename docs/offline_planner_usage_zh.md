@@ -187,6 +187,12 @@ planner:
   objective:
     maximum_load_weight: 1.0
     total_load_weight: 0.1
+  allocation:
+    max_passes: 8
+    max_candidate_evaluations: 50000
+    budget_seconds: 1.0
+    balance_task_counts: true
+    balance_load_slack: 0.10
   traversal:
     time_step_seconds: 0.1
     nominal_speed_mps: 0.5
@@ -219,6 +225,20 @@ planner:
   超时检查覆盖预约构建、搜索、轨迹重建与最终碰撞检查；属于协作式预算，不是实时系统的硬截止保证。
 - `maximum_load_weight`：最大单机负载权重，越大越倾向负载均衡。
 - `total_load_weight`：所有机器人总负载权重，越大越倾向减少总路程和总时间。
+- `allocation`：启发式插入后，不再按“任务是否超过 20 个”跳过任务搬移优化。
+  首先按原最大负载和总负载加权目标优化任务归属和顺序，再改善每台机器人分配的任务 ID 数量。
+  能力限制始终保留，同一位置合并的多个任务仍分别计数，不强制每台设备点数相同。
+- `allocation.max_passes`：每个优化阶段最多接受的搬移次数，默认 8；设置为 0 可仅保留启发式插入。
+  `max_candidate_evaluations` 与 `budget_seconds` 是两个阶段共享的候选数/墙钟预算，默认 50000 / 1 秒。
+  预算耗尽时保留完整有效的最佳分配；预算从插入结束后开始，不包含地图读取、距离预计算、
+  初始插入、最终路径生成或时间协调。墙钟限制为协作式检查，不是实时硬截止。
+- `allocation.balance_task_counts`：默认开启点数均衡；关闭后仍执行按耗时目标的任务搬移。
+  `balance_load_slack` 是相对耗时优化结果的最大负载和总负载允许增幅，默认均为 10%。
+  既检查分配距离估算，也在最终路径重算后检查；超出时撤回点数均衡，保留耗时优化结果。
+  这是用有限路线代价改善点数公平性的显式取舍，不承诺每项耗时均优于原始插入结果。
+  时间协调仍在其后进行，因此该界限不包含协调额外等待或真实导航延迟。
+  `plan.json.allocation` 和 CLI 输出可查看候选数、耗时优化/点数均衡搬移次数、
+  预算耗尽、均衡回退，以及插入后/最终分配点数，便于审计。
 - `time_step_seconds`：时间离散粒度。
 - `nominal_speed_mps`：机器人在栅格中的标称速度。
 - `obstacle_cost_weight`：靠近障碍物的软代价权重。

@@ -15,6 +15,12 @@ planner:
   objective:
     maximum_load_weight: 1.0
     total_load_weight: 0.1
+  allocation:
+    max_passes: 8
+    max_candidate_evaluations: 50000
+    budget_seconds: 1.0
+    balance_task_counts: true
+    balance_load_slack: 0.10
   traversal:
     time_step_seconds: 0.1
     nominal_speed_mps: 0.5

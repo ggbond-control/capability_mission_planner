@@ -151,7 +151,80 @@ namespace capability_mission_planner::offline
                 result.route.service_ticks += service_ticks;
                 return result;
             }
+
+            RouteState removed(std::size_t task_index, int service_ticks,
+                               const std::vector<MappedTask> &tasks) const
+            {
+                RouteState result = *this;
+                for (std::size_t position = 0; position < route.stops.size(); ++position)
+                {
+                    auto &stop = result.route.stops[position];
+                    const auto found = std::find(stop.task_indices.begin(), stop.task_indices.end(), task_index);
+                    if (found == stop.task_indices.end())
+                        continue;
+                    stop.task_indices.erase(found);
+                    stop.service_ticks -= service_ticks;
+                    result.route.service_ticks -= service_ticks;
+                    if (!stop.task_indices.empty())
+                    {
+                        stop.position_tolerance_m = 0.0;
+                        for (const auto index : stop.task_indices)
+                            stop.position_tolerance_m = std::max(stop.position_tolerance_m, tasks[index].position_tolerance_m);
+                        return result;
+                    }
+                    result.route.stops.erase(result.route.stops.begin() + static_cast<std::ptrdiff_t>(position));
+                    if (result.route.stops.empty())
+                    {
+                        result.edges.clear();
+                        result.route.travel_ticks = 0;
+                        return result;
+                    }
+                    const auto previous = position == 0U ? robot->start : route.stops[position - 1U].location;
+                    const bool has_next = position + 1U < route.stops.size() || robot->return_position.has_value();
+                    const int joined = has_next ? edge(previous, position + 1U < route.stops.size()
+                        ? route.stops[position + 1U].location : *robot->return_position) : 0;
+                    result.route.travel_ticks += joined - edges[position] -
+                        (position + 1U < edges.size() ? edges[position + 1U] : 0);
+                    result.edges.erase(result.edges.begin() + static_cast<std::ptrdiff_t>(position));
+                    if (position < result.edges.size())
+                        result.edges[position] = joined;
+                    return result;
+                }
+                throw std::logic_error("cannot remove an unassigned task");
+            }
         };
+
+        std::vector<std::size_t> task_counts(const std::vector<MappedRobotRoute> &routes)
+        {
+            std::vector<std::size_t> counts;
+            for (const auto &route : routes)
+            {
+                std::size_t count = 0;
+                for (const auto &stop : route.stops)
+                    count += stop.task_indices.size();
+                counts.push_back(count);
+            }
+            return counts;
+        }
+
+        std::pair<int, long long> loads(const std::vector<MappedRobotRoute> &routes)
+        {
+            int maximum = 0;
+            long long total = 0;
+            for (const auto &route : routes)
+            {
+                maximum = std::max(maximum, route.load_ticks());
+                total += route.load_ticks();
+            }
+            return {maximum, total};
+        }
+
+        bool within_slack(const std::pair<int, long long> &candidate,
+                          const std::pair<int, long long> &reference, double slack)
+        {
+            return candidate.first <= reference.first * (1.0 + slack) + 1e-9 &&
+                   candidate.second <= reference.second * (1.0 + slack) + 1e-9;
+        }
 
         std::vector<RouteState> state_insertion_options(const RouteState &source,
                                                         std::size_t task_index, const MappedTask &task, int service_ticks)
@@ -352,7 +425,8 @@ namespace capability_mission_planner::offline
         std::vector<MappedRobotRoute> build_routes(
             const std::vector<MappedRobot> &robots, const std::vector<MappedTask> &tasks,
             const std::vector<int> &service_ticks, const MultiMapPathPlanner &planner,
-            const ObjectiveWeights &weights, unsigned int seed)
+            const ObjectiveWeights &weights, const AllocationOptions &options,
+            AllocationStats &stats, std::vector<MappedRobotRoute> &before_balancing)
         {
             std::vector<MappedRobotRoute> routes(robots.size());
             for (std::size_t i = 0; i < routes.size(); ++i)
@@ -368,7 +442,6 @@ namespace capability_mission_planner::offline
             std::set<std::size_t> remaining;
             for (std::size_t i = 0; i < tasks.size(); ++i)
                 remaining.insert(i);
-            (void)seed;
             while (!remaining.empty())
             {
                 std::vector<std::size_t> shortlist(remaining.begin(), remaining.end());
@@ -439,63 +512,99 @@ namespace capability_mission_planner::offline
                 remaining.erase(ti);
             }
 
-            // Relocation/swap neighborhoods are useful on small instances, but their
-            // full-route recomputation grows too quickly for dense task sets.
-            const auto max_passes = tasks.size() <= 20U
-                                        ? std::min<std::size_t>(tasks.size() + 1U, 8U)
-                                        : 0U;
-            for (std::size_t pass = 0; pass < max_passes; ++pass)
+            stats.initial_task_counts = task_counts(routes);
+            const auto started = std::chrono::steady_clock::now();
+            const auto exhausted = [&]()
             {
-                std::vector<RouteState> pass_states(robots.size());
-                for (std::size_t i = 0; i < robots.size(); ++i)
+                if (stats.candidate_evaluations >= options.max_candidate_evaluations ||
+                    std::chrono::duration<double>(std::chrono::steady_clock::now() - started).count() >= options.budget_seconds)
+                    stats.budget_exhausted = true;
+                return stats.budget_exhausted;
+            };
+            // Use edge deltas and retain only the winning pair of routes, rather
+            // than rebuilding/copying every robot's route for every trial.
+            const auto improve = [&](bool balancing, const std::pair<int, long long> &reference)
+            {
+                for (std::size_t pass = 0; pass < options.max_passes && !exhausted(); ++pass)
                 {
-                    pass_states[i].route = routes[i];
-                    pass_states[i].robot = &robots[i];
-                    pass_states[i].planner = &planner;
-                    pass_states[i].rebuild();
-                }
-                double best = objective(routes, weights);
-                std::vector<MappedRobotRoute> improved;
-                for (std::size_t source = 0; source < robots.size(); ++source)
-                {
-                    std::vector<std::size_t> assigned;
-                    for (const auto &stop : routes[source].stops)
-                        assigned.insert(assigned.end(), stop.task_indices.begin(), stop.task_indices.end());
-                    for (const auto ti : assigned)
+                    const auto counts = task_counts(routes);
+                    double best = objective(routes, weights);
+                    long long best_count_delta = 0;
+                    std::optional<std::pair<RouteState, RouteState>> winner;
+                    std::size_t winner_source = 0, winner_target = 0;
+                    for (std::size_t source = 0; source < robots.size() && !exhausted(); ++source)
                     {
-                        auto without_state = pass_states[source];
-                        for (std::size_t i = 0; i < without_state.route.stops.size(); ++i)
-                            if (std::find(without_state.route.stops[i].task_indices.begin(), without_state.route.stops[i].task_indices.end(), ti) != without_state.route.stops[i].task_indices.end())
+                        for (const auto &stop : routes[source].stops)
+                        {
+                            if (exhausted()) break;
+                            for (const auto ti : stop.task_indices)
                             {
-                                without_state.route.stops[i].task_indices.erase(std::find(without_state.route.stops[i].task_indices.begin(), without_state.route.stops[i].task_indices.end(), ti));
-                                without_state.route.stops[i].service_ticks -= service_ticks[ti];
-                                if (without_state.route.stops[i].task_indices.empty())
-                                    without_state.route.stops.erase(without_state.route.stops.begin() + static_cast<std::ptrdiff_t>(i));
-                                without_state.rebuild();
-                                break;
-                            }
-                        auto without = routes;
-                        without[source] = without_state.route;
-                        for (std::size_t target = 0; target < robots.size(); ++target)
-                            if (compatible(robots[target], tasks[ti]))
-                                for (const auto &candidate : state_insertion_options(target == source ? without_state : pass_states[target], ti, tasks[ti], service_ticks[ti]))
+                                if (exhausted()) break;
+                                const auto without = states[source].removed(ti, service_ticks[ti], tasks);
+                                for (std::size_t target = 0; target < robots.size() && !exhausted(); ++target)
                                 {
-                                    auto trial = without;
-                                    trial[target] = candidate.route;
-                                    const double score = objective(trial, weights);
-                                    if (score + 1e-9 < best)
+                                    if (!compatible(robots[target], tasks[ti]) ||
+                                        (balancing && (target == source || counts[source] <= counts[target] + 1U)))
+                                        continue;
+                                    const auto &base = target == source ? without : states[target];
+                                    const long long count_delta = target == source ? 0 :
+                                        2LL * (static_cast<long long>(counts[target]) - static_cast<long long>(counts[source]) + 1LL);
+                                    // Iterate incrementally, so a large neighborhood
+                                    // cannot bypass either compute budget.
+                                    for (std::size_t position = 0; position <= base.route.stops.size(); ++position)
                                     {
-                                        best = score;
-                                        improved = std::move(trial);
+                                        if (exhausted()) break;
+                                        const auto existing = std::find_if(base.route.stops.begin(), base.route.stops.end(),
+                                            [&](const auto &s) { return s.location == tasks[ti].location; });
+                                        if (existing != base.route.stops.end() &&
+                                            position != static_cast<std::size_t>(existing - base.route.stops.begin()))
+                                            continue;
+                                        ++stats.candidate_evaluations;
+                                        auto candidate = existing == base.route.stops.end()
+                                            ? base.inserted(position, {tasks[ti].location, {ti}, service_ticks[ti], tasks[ti].position_tolerance_m})
+                                            : base.merged(position, ti, service_ticks[ti], tasks[ti].position_tolerance_m);
+                                        int maximum = 0;
+                                        long long total = 0;
+                                        for (std::size_t r = 0; r < routes.size(); ++r)
+                                        {
+                                            const int load = r == target ? candidate.route.load_ticks() :
+                                                r == source ? without.route.load_ticks() : routes[r].load_ticks();
+                                            maximum = std::max(maximum, load);
+                                            total += load;
+                                        }
+                                        const double score = weights.maximum_load * maximum + weights.total_load * total;
+                                        const bool better = balancing
+                                            ? within_slack({maximum, total}, reference, options.balance_load_slack) &&
+                                                (count_delta < best_count_delta ||
+                                                 (count_delta == best_count_delta && score + 1e-9 < best))
+                                            : score + 1e-9 < best;
+                                        if (better)
+                                        {
+                                            best = score;
+                                            best_count_delta = count_delta;
+                                            winner = {without, std::move(candidate)};
+                                            winner_source = source;
+                                            winner_target = target;
+                                        }
                                     }
                                 }
+                            }
+                        }
                     }
+                    if (!winner) break;
+                    states[winner_source] = std::move(winner->first);
+                    states[winner_target] = std::move(winner->second);
+                    routes[winner_source] = states[winner_source].route;
+                    routes[winner_target] = states[winner_target].route;
+                    if (balancing) ++stats.balancing_moves;
+                    else ++stats.relocation_moves;
                 }
-                if (improved.empty())
-                    break;
-                routes = std::move(improved);
-            }
-
+            };
+            improve(false, {});
+            before_balancing = routes;
+            if (options.balance_task_counts)
+                improve(true, loads(routes));
+            stats.local_search_seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - started).count();
             return routes;
         }
     } // namespace
@@ -535,11 +644,15 @@ namespace capability_mission_planner::offline
 
     OfflineMissionPlanner::OfflineMissionPlanner(
         MultiMapPathPlanner path_planner,
-        ObjectiveWeights weights)
-        : _path_planner(std::move(path_planner)), _weights(weights)
+        ObjectiveWeights weights, AllocationOptions allocation)
+        : _path_planner(std::move(path_planner)), _weights(weights), _allocation(allocation)
     {
         if (weights.maximum_load < 0.0 || weights.total_load < 0.0)
             throw std::invalid_argument("objective weights must be non-negative");
+        if (!std::isfinite(allocation.budget_seconds) || allocation.budget_seconds <= 0.0 ||
+            allocation.max_candidate_evaluations == 0U ||
+            !std::isfinite(allocation.balance_load_slack) || allocation.balance_load_slack < 0.0)
+            throw std::invalid_argument("allocation requires a positive finite budget and non-negative finite load slack");
     }
 
     OfflineMissionPlan OfflineMissionPlanner::plan(
@@ -618,7 +731,10 @@ namespace capability_mission_planner::offline
         const auto precompute_started = std::chrono::steady_clock::now();
         _path_planner.precompute_estimates(estimate_positions, estimate_profiles);
         const auto precompute_finished = std::chrono::steady_clock::now();
-        auto routes = build_routes(robots, tasks, service_ticks, _path_planner, _weights, 0U);
+        AllocationStats allocation_stats;
+        std::vector<MappedRobotRoute> before_balancing;
+        auto routes = build_routes(robots, tasks, service_ticks, _path_planner, _weights,
+                                   _allocation, allocation_stats, before_balancing);
         const auto allocation_finished = std::chrono::steady_clock::now();
 
         OfflineMissionPlan result;
@@ -636,6 +752,20 @@ namespace capability_mission_planner::offline
             // coordination timeline. plan_exact remains available for explicit
             // full-resolution refinement by callers.
             recompute_route(result.routes[i], robots[i], _path_planner, false);
+        // Distance estimates and final paths can differ. Enforce the same count
+        // balancing bound on the exported, realized travel estimates as well.
+        if (allocation_stats.balancing_moves > 0U)
+        {
+            for (std::size_t i = 0; i < before_balancing.size(); ++i)
+                recompute_route(before_balancing[i], robots[i], _path_planner, false);
+            if (!within_slack(loads(result.routes), loads(before_balancing), _allocation.balance_load_slack))
+            {
+                result.routes = std::move(before_balancing);
+                allocation_stats.balance_reverted = true;
+            }
+        }
+        allocation_stats.final_task_counts = task_counts(result.routes);
+        result.allocation_stats = std::move(allocation_stats);
         const auto final_finished = std::chrono::steady_clock::now();
         result.final_path_seconds = std::chrono::duration<double>(
                                         final_finished - final_started)

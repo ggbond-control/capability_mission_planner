@@ -78,7 +78,7 @@ namespace capability_mission_planner::offline
                     OfflineMissionPlan plan;
                     try
                     {
-                        OfflineMissionPlanner planner(MultiMapPathPlanner(mission.bundle, mission.traversal), mission.objective);
+                        OfflineMissionPlanner planner(MultiMapPathPlanner(mission.bundle, mission.traversal), mission.objective, mission.allocation);
                         plan = planner.plan(mission.robots, mission.tasks, mission.coordinate_conflicts);
                     }
                     catch (const std::exception &error)

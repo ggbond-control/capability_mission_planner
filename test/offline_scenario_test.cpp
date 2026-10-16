@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
                 "unexpected task count");
 
         OfflineMissionPlanner planner{
-            MultiMapPathPlanner(request.bundle, request.traversal), request.objective};
+            MultiMapPathPlanner(request.bundle, request.traversal), request.objective, request.allocation};
         const auto plan = planner.plan(
             request.robots, request.tasks, request.coordinate_conflicts);
 

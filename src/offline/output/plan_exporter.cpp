@@ -203,6 +203,25 @@ namespace capability_mission_planner::offline
                    << ",\n  \"total_load_ticks\": " << plan.total_load_ticks
                    << ",\n  \"total_load_seconds\": "
                    << plan.total_load_ticks * plan.time_step_seconds << ",\n";
+            output << "  \"allocation\": {\"candidate_evaluations\": " << plan.allocation_stats.candidate_evaluations
+                   << ", \"relocation_moves\": " << plan.allocation_stats.relocation_moves
+                   << ", \"balancing_moves\": " << plan.allocation_stats.balancing_moves
+                   << ", \"budget_exhausted\": " << (plan.allocation_stats.budget_exhausted ? "true" : "false")
+                   << ", \"balance_reverted\": " << (plan.allocation_stats.balance_reverted ? "true" : "false")
+                   << ", \"local_search_seconds\": " << plan.allocation_stats.local_search_seconds
+                   << ", \"initial_task_counts\": [";
+            for (std::size_t i = 0; i < plan.allocation_stats.initial_task_counts.size(); ++i)
+            {
+                if (i) output << ',';
+                output << plan.allocation_stats.initial_task_counts[i];
+            }
+            output << "], \"final_task_counts\": [";
+            for (std::size_t i = 0; i < plan.allocation_stats.final_task_counts.size(); ++i)
+            {
+                if (i) output << ',';
+                output << plan.allocation_stats.final_task_counts[i];
+            }
+            output << "]},\n";
             output << "  \"coordination\": {\"method\": " << json(coordination_method(plan))
                    << ", \"prioritized_succeeded\": " << (plan.coordination_stats.prioritized_succeeded ? "true" : "false")
                    << ", \"cbs_started\": " << (plan.coordination_stats.cbs_started ? "true" : "false")
