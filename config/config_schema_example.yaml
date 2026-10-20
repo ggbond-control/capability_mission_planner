@@ -1,6 +1,8 @@
 map:
   directory: /path/to/map_bundle
   allow_unknown: false
+  free_thresh_override: 0.01
+  occupied_thresh_override: 1.0
   inflation_radius_m: 0.0
   inscribed_radius_m: 0.0
   cost_scaling_factor: 10.0

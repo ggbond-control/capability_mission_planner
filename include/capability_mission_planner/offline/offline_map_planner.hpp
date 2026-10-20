@@ -90,6 +90,8 @@ namespace capability_mission_planner::offline
         double cost_scaling_factor = 10.0;
         bool persistent_cache = true;
         std::filesystem::path cache_directory;
+        std::optional<double> free_thresh_override;
+        std::optional<double> occupied_thresh_override;
     };
 
     struct MultiMapBundle

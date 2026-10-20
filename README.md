@@ -74,6 +74,13 @@ relations are resolved into a common ROOT coordinate frame. Transition rows
 define stairs, elevators, or other portals; traversal can require matching
 robot capabilities.
 
+Optional mission input keys `map.free_thresh_override` and
+`map.occupied_thresh_override` override the corresponding map YAML thresholds
+for this planner only. Omit either key to inherit that value per map. Effective
+thresholds must be finite and satisfy `0 <= free <= occupied <= 1`. Both overrides
+are included in the persistent map cache signature. Source map files are not modified.
+See [map configuration](docs/offline_planner_usage_zh.md#4-地图输入) for classification details.
+
 Scenario maps and mission configurations are maintained separately in
 [`capability_mission_scenarios`](../capability_mission_scenarios). Run the
 supplied single-map and seven-map validations with:

@@ -20,7 +20,7 @@ namespace capability_mission_planner::offline
     namespace
     {
         constexpr double pi = 3.14159265358979323846;
-        constexpr std::uint64_t map_cache_magic = 0x434d504d415000ULL; // "CMPMAP"
+        constexpr std::uint64_t map_cache_magic = 0x434d504d415001ULL; // "CMPMAP", format 1
         constexpr std::uint32_t max_cache_string_size = 4096U;
 
         struct SourceFingerprint
@@ -101,12 +101,15 @@ namespace capability_mission_planner::offline
         }
 
         bool matches_options(const MapLoadOptions &options, bool allow_unknown,
-                             double inflation_radius, double inscribed_radius, double cost_scaling_factor)
+                             double inflation_radius, double inscribed_radius, double cost_scaling_factor,
+                             double free_threshold_override, double occupied_threshold_override)
         {
             return options.allow_unknown == allow_unknown &&
                    options.inflation_radius == inflation_radius &&
                    options.inscribed_radius == inscribed_radius &&
-                   options.cost_scaling_factor == cost_scaling_factor;
+                   options.cost_scaling_factor == cost_scaling_factor &&
+                   options.free_thresh_override.value_or(-1.0) == free_threshold_override &&
+                   options.occupied_thresh_override.value_or(-1.0) == occupied_threshold_override;
         }
 
         bool load_cached_map(
@@ -122,6 +125,8 @@ namespace capability_mission_planner::offline
             double inflation_radius = 0.0;
             double inscribed_radius = 0.0;
             double cost_scaling_factor = 0.0;
+            double free_threshold_override = -1.0;
+            double occupied_threshold_override = -1.0;
             std::int32_t width = 0;
             std::int32_t height = 0;
             std::string id;
@@ -139,13 +144,15 @@ namespace capability_mission_planner::offline
                 !read_binary(input, inflation_radius) ||
                 !read_binary(input, inscribed_radius) ||
                 !read_binary(input, cost_scaling_factor) ||
+                !read_binary(input, free_threshold_override) ||
+                !read_binary(input, occupied_threshold_override) ||
                 !read_string(input, id) || !read_string(input, image_path) ||
                 !read_binary(input, width) || !read_binary(input, height) ||
                 !read_binary(input, resolution) || !read_binary(input, origin_x) ||
                 !read_binary(input, origin_y) || !read_binary(input, origin_yaw) ||
                 id != map.id || width <= 0 || height <= 0 || !(resolution > 0.0) ||
                 !matches_options(options, allow_unknown, inflation_radius, inscribed_radius,
-                                 cost_scaling_factor))
+                                 cost_scaling_factor, free_threshold_override, occupied_threshold_override))
                 return false;
             SourceFingerprint current_yaml;
             const auto cached_image_path = std::filesystem::path(image_path);
@@ -214,6 +221,8 @@ namespace capability_mission_planner::offline
                 !write_binary(output, options.inflation_radius) ||
                 !write_binary(output, options.inscribed_radius) ||
                 !write_binary(output, options.cost_scaling_factor) ||
+                !write_binary(output, options.free_thresh_override.value_or(-1.0)) ||
+                !write_binary(output, options.occupied_thresh_override.value_or(-1.0)) ||
                 !write_string(output, map.id) || !write_string(output, map.image_path.string()) ||
                 !write_binary(output, width) || !write_binary(output, height) ||
                 !write_binary(output, map.resolution) || !write_binary(output, map.origin_x) ||
@@ -301,6 +310,14 @@ namespace capability_mission_planner::offline
 
         MapLayer load_map(const std::filesystem::path &yaml_path, const MapLoadOptions &options)
         {
+            for (const auto &threshold : {options.free_thresh_override, options.occupied_thresh_override})
+            {
+                if (threshold && (!std::isfinite(*threshold) || *threshold < 0.0 || *threshold > 1.0))
+                    throw std::runtime_error(yaml_path.string() + ": occupancy threshold overrides must be finite and in [0, 1]");
+            }
+            if (options.free_thresh_override && options.occupied_thresh_override &&
+                *options.free_thresh_override > *options.occupied_thresh_override)
+                throw std::runtime_error(yaml_path.string() + ": free_thresh_override exceeds occupied_thresh_override");
             if (options.inflation_radius < 0.0 || options.inscribed_radius < 0.0 ||
                 options.cost_scaling_factor <= 0.0)
             {
@@ -341,11 +358,14 @@ namespace capability_mission_planner::offline
 
             const bool negate = yaml["negate"] ? yaml["negate"].as<int>() != 0 : false;
             const double occupied_threshold =
-                yaml["occupied_thresh"] ? yaml["occupied_thresh"].as<double>() : 0.65;
+                options.occupied_thresh_override ? *options.occupied_thresh_override :
+                (yaml["occupied_thresh"] ? yaml["occupied_thresh"].as<double>() : 0.65);
             const double free_threshold =
-                yaml["free_thresh"] ? yaml["free_thresh"].as<double>() : 0.196;
+                options.free_thresh_override ? *options.free_thresh_override :
+                (yaml["free_thresh"] ? yaml["free_thresh"].as<double>() : 0.196);
             const std::string mode = yaml["mode"] ? yaml["mode"].as<std::string>() : "trinary";
-            if (occupied_threshold < 0.0 || occupied_threshold > 1.0 ||
+            if (!std::isfinite(occupied_threshold) || !std::isfinite(free_threshold) ||
+                occupied_threshold < 0.0 || occupied_threshold > 1.0 ||
                 free_threshold < 0.0 || free_threshold > 1.0 ||
                 free_threshold > occupied_threshold)
             {

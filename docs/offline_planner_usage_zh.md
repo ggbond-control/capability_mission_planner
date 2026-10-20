@@ -86,6 +86,8 @@ transition_points.csv
 map:
   directory: ../../maps/myj1
   allow_unknown: false
+  free_thresh_override: 0.01
+  occupied_thresh_override: 1.0
   inflation_radius_m: 0.0
   inscribed_radius_m: 0.0
   cost_scaling_factor: 10.0
@@ -94,6 +96,18 @@ map:
 ```
 
 - `allow_unknown`：是否允许路径经过未知栅格。
+- `free_thresh_override`、`occupied_thresh_override`：可选占用概率阈值覆盖，
+  仅供多机规划器使用，不改写原地图 YAML/PNG，也不改变导航参数。
+  每项均须为 `[0, 1]` 内的有限数，生效后的 `free <= occupied`；
+  单独设置一项时，会与每张地图继承的另一项共同校验。
+  不填写表示继承；规划器 YAML 不使用 Server 参数的 `-1.0` 哨兵值。
+  对 `scale`/`trinary`，先按 `negate` 转为占用概率 `p`：
+  `p <= free` 可通行；`free < p < occupied` 仅在 `allow_unknown=true` 时可通行；
+  其余不可通行。保留原有边界规则，`free == occupied` 时等值归自由区域。
+  因此默认 `allow_unknown=false` 时，只调整 occupied 不会放宽可通行范围。
+  `raw` 模式沿用已有规则：只接受 0～100 的像素值，按 `pixel/100 <= free` 判定；
+  occupied 和 allow_unknown 不改变 raw 的判定。
+  修改覆盖值会自动重建缓存；旧缓存格式也会自动失效。
 - `inflation_radius_m`：按机器人安全半径膨胀障碍物，单位为米。
 - `inscribed_radius_m` 和 `cost_scaling_factor`：生成 Nav2 风格简化软代价场，供
   任务级路线排序使用，不替代 Nav2 的实时 footprint 检查。

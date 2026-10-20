@@ -210,6 +210,10 @@ namespace capability_mission_planner::offline
         if (!root["map"]["directory"])
             throw std::runtime_error("map.directory is required");
         MapLoadOptions map_options;
+        if (root["map"]["free_thresh_override"])
+            map_options.free_thresh_override = root["map"]["free_thresh_override"].as<double>();
+        if (root["map"]["occupied_thresh_override"])
+            map_options.occupied_thresh_override = root["map"]["occupied_thresh_override"].as<double>();
         if (root["map"]["allow_unknown"])
             map_options.allow_unknown = root["map"]["allow_unknown"].as<bool>();
         if (root["map"]["inflation_radius_m"])
