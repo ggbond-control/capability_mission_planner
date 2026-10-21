@@ -253,6 +253,16 @@ namespace capability_mission_planner::offline
             const CapabilitySet &capabilities,
             double required_clearance_m,
             double nominal_speed_mps = 0.0) const;
+        // Allocation score only: scale a common reference-speed estimate once
+        // per leg. These ticks must never be used as coordination timestamps.
+        static constexpr double allocation_reference_speed_mps = 1.0;
+        int estimate_allocation_ticks(
+            const GridPosition &start,
+            const GridPosition &goal,
+            const CapabilitySet &capabilities,
+            double required_clearance_m,
+            double nominal_speed_mps = 0.0,
+            double reference_speed_mps = allocation_reference_speed_mps) const;
         void precompute_estimates(
             const std::vector<GridPosition> &positions,
             const std::vector<PathQueryProfile> &profiles) const;

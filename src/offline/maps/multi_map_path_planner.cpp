@@ -887,8 +887,43 @@ namespace capability_mission_planner::offline
         }
         catch (const std::runtime_error &)
         {
-            return distance(start, goal, capabilities, required_clearance_m);
+            return plan(start, goal, capabilities, required_clearance_m, nominal_speed_mps).travel_ticks;
         }
+    }
+
+    int MultiMapPathPlanner::estimate_allocation_ticks(
+        const GridPosition &start, const GridPosition &goal,
+        const CapabilitySet &capabilities, double required_clearance_m,
+        double nominal_speed_mps, double reference_speed_mps) const
+    {
+        const double speed = nominal_speed_mps > 0.0 ? nominal_speed_mps : _options.nominal_speed_mps;
+        if (!std::isfinite(speed) || speed <= 0.0 ||
+            !std::isfinite(reference_speed_mps) || reference_speed_mps <= 0.0)
+            throw std::invalid_argument("allocation speed must be finite and positive");
+        int reference_ticks = 0;
+        int fixed_ticks = 0;
+        if (start.map_id == goal.map_id)
+            reference_ticks = estimate_distance(start, goal, capabilities, required_clearance_m,
+                                                reference_speed_mps);
+        else
+        {
+            // Cross-map legs include fixed portal / map-switch durations. The
+            // cached reference path identifies those without another search.
+            const auto path = plan(start, goal, capabilities, required_clearance_m,
+                                   reference_speed_mps);
+            reference_ticks = path.travel_ticks;
+            for (std::size_t i = 1; i < path.steps.size(); ++i)
+                if (!path.steps[i].transition_id.empty())
+                    fixed_ticks += path.steps[i].arrival_tick - path.steps[i - 1U].arrival_tick;
+        }
+        if (speed == reference_speed_mps)
+            return reference_ticks;
+        const double movement = std::ceil(
+            (reference_ticks - fixed_ticks) * reference_speed_mps / speed - 1e-9);
+        const double total = fixed_ticks + std::max(reference_ticks > fixed_ticks ? 1.0 : 0.0, movement);
+        if (!std::isfinite(total) || total > std::numeric_limits<int>::max())
+            throw std::overflow_error("allocation travel estimate exceeds tick range");
+        return static_cast<int>(total);
     }
 
     PathPlannerStats MultiMapPathPlanner::stats() const

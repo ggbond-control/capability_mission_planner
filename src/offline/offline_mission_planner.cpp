@@ -91,12 +91,14 @@ namespace capability_mission_planner::offline
             std::vector<int> edges;
             const MappedRobot *robot = nullptr;
             const MultiMapPathPlanner *planner = nullptr;
+            double reference_speed_mps = MultiMapPathPlanner::allocation_reference_speed_mps;
 
             int edge(const GridPosition &from, const GridPosition &to) const
             {
                 const double clearance = std::max(0.0, robot->clearance_radius_m + robot->safety_margin_m);
                 const double speed = robot->nominal_speed_mps > 0.0 ? robot->nominal_speed_mps : planner->options().nominal_speed_mps;
-                return planner->estimate_distance(from, to, robot->capabilities, clearance, speed);
+                return planner->estimate_allocation_ticks(from, to, robot->capabilities, clearance, speed,
+                                                         reference_speed_mps);
             }
 
             void rebuild()
@@ -426,7 +428,8 @@ namespace capability_mission_planner::offline
             const std::vector<MappedRobot> &robots, const std::vector<MappedTask> &tasks,
             const std::vector<int> &service_ticks, const MultiMapPathPlanner &planner,
             const ObjectiveWeights &weights, const AllocationOptions &options,
-            AllocationStats &stats, std::vector<MappedRobotRoute> &before_balancing)
+            AllocationStats &stats, std::vector<MappedRobotRoute> &before_balancing,
+            double reference_speed_mps)
         {
             std::vector<MappedRobotRoute> routes(robots.size());
             for (std::size_t i = 0; i < routes.size(); ++i)
@@ -437,6 +440,7 @@ namespace capability_mission_planner::offline
                 states[i].route = routes[i];
                 states[i].robot = &robots[i];
                 states[i].planner = &planner;
+                states[i].reference_speed_mps = reference_speed_mps;
                 states[i].rebuild();
             }
             std::set<std::size_t> remaining;
@@ -714,11 +718,19 @@ namespace capability_mission_planner::offline
             add_position(task.location);
         std::vector<PathQueryProfile> estimate_profiles;
         estimate_profiles.reserve(robots.size());
+        // Same-speed fleets retain their existing estimates. A mixed fleet
+        // shares the slowest member's profile, then scales once per leg.
+        double reference_speed = std::numeric_limits<double>::infinity();
+        for (const auto &robot : robots)
+            reference_speed = std::min(reference_speed, robot.nominal_speed_mps > 0.0
+                ? robot.nominal_speed_mps : _path_planner.options().nominal_speed_mps);
+        if (robots.empty())
+            reference_speed = MultiMapPathPlanner::allocation_reference_speed_mps;
         for (const auto &robot : robots)
         {
             const PathQueryProfile profile{
                 std::max(0.0, robot.clearance_radius_m + robot.safety_margin_m),
-                robot.nominal_speed_mps > 0.0 ? robot.nominal_speed_mps : _path_planner.options().nominal_speed_mps};
+                reference_speed};
             const auto found = std::find_if(estimate_profiles.begin(), estimate_profiles.end(),
                                             [&](const auto &existing)
                                             {
@@ -734,7 +746,7 @@ namespace capability_mission_planner::offline
         AllocationStats allocation_stats;
         std::vector<MappedRobotRoute> before_balancing;
         auto routes = build_routes(robots, tasks, service_ticks, _path_planner, _weights,
-                                   _allocation, allocation_stats, before_balancing);
+                                   _allocation, allocation_stats, before_balancing, reference_speed);
         const auto allocation_finished = std::chrono::steady_clock::now();
 
         OfflineMissionPlan result;
@@ -747,23 +759,21 @@ namespace capability_mission_planner::offline
         result.allocation_path_stats = _path_planner.stats();
         result.routes = std::move(routes);
         const auto final_started = std::chrono::steady_clock::now();
-        for (std::size_t i = 0; i < result.routes.size(); ++i)
-            // Keep the configured planning resolution for reported loads and the
-            // coordination timeline. plan_exact remains available for explicit
-            // full-resolution refinement by callers.
-            recompute_route(result.routes[i], robots[i], _path_planner, false);
-        // Distance estimates and final paths can differ. Enforce the same count
-        // balancing bound on the exported, realized travel estimates as well.
+        // The final allocation guard must use the same speed-adjusted scores as
+        // insertion and relocation, before replacing them with timeline ticks.
         if (allocation_stats.balancing_moves > 0U)
         {
-            for (std::size_t i = 0; i < before_balancing.size(); ++i)
-                recompute_route(before_balancing[i], robots[i], _path_planner, false);
             if (!within_slack(loads(result.routes), loads(before_balancing), _allocation.balance_load_slack))
             {
                 result.routes = std::move(before_balancing);
                 allocation_stats.balance_reverted = true;
             }
         }
+        for (std::size_t i = 0; i < result.routes.size(); ++i)
+            // Exported travel/load ticks and coordination remain on the existing
+            // coarse timeline; allocation scores are deliberately not exported
+            // in their place. Navigation arrival / holding semantics stay intact.
+            recompute_route(result.routes[i], robots[i], _path_planner, false);
         allocation_stats.final_task_counts = task_counts(result.routes);
         result.allocation_stats = std::move(allocation_stats);
         const auto final_finished = std::chrono::steady_clock::now();
